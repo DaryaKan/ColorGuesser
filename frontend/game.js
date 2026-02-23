@@ -216,15 +216,12 @@
         updateBackCards();
         showCardContent("game");
 
-        els.cardFront.classList.remove("fly-away", "fade-in");
+        els.cardFront.classList.remove("fly-away");
         els.cardFront.style.transform = "";
         els.cardFront.style.opacity = "";
 
         showScreen("cards");
-        requestAnimationFrame(() => {
-            els.cardFront.classList.add("fade-in");
-            drawColorWheel();
-        });
+        requestAnimationFrame(() => drawColorWheel());
     }
 
     async function confirmPick() {
