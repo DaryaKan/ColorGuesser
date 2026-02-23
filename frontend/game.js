@@ -365,11 +365,19 @@
         els.btnSave.disabled = !els.nicknameInput.value.trim();
     });
 
-    // Prevent page scroll on touch (long tap, swipe, overscroll)
+    // Prevent page scroll on touch, but allow scrolling inside scrollable areas
     document.addEventListener("touchmove", (e) => {
-        const tag = e.target.tagName;
-        const isScrollable = e.target.closest(".leaderboard-wrapper") || e.target.closest(".score-list");
-        if (!isScrollable && tag !== "INPUT") e.preventDefault();
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+        let node = e.target;
+        while (node && node !== document.body) {
+            const style = window.getComputedStyle(node);
+            const overflowY = style.overflowY;
+            if ((overflowY === "auto" || overflowY === "scroll") && node.scrollHeight > node.clientHeight) {
+                return;
+            }
+            node = node.parentElement;
+        }
+        e.preventDefault();
     }, { passive: false });
 
     document.addEventListener("contextmenu", (e) => e.preventDefault());
