@@ -176,6 +176,11 @@ h2 {
     font-weight: 700;
 }
 
+.percentile-text {
+    font-size: 15px;
+    color: var(--text-secondary);
+}
+
 .final-score-text {
     font-size: 36px;
     font-weight: 700;

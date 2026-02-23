@@ -69,6 +69,18 @@ async def activate_score(nickname: str, score_id: int) -> bool:
         return True
 
 
+async def get_round_percentile(round_score: int, total_rounds: int = 4) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute("SELECT score FROM scores")
+        rows = await cursor.fetchall()
+
+    if not rows:
+        return 100
+
+    below = sum(1 for (total,) in rows if total / total_rounds < round_score)
+    return round(below / len(rows) * 100)
+
+
 async def get_leaderboard(limit: int = 50) -> list[dict]:
     async with aiosqlite.connect(DB_PATH) as db:
         db.row_factory = aiosqlite.Row

@@ -25,6 +25,7 @@
         resultTarget: document.getElementById("result-target"),
         resultPicked: document.getElementById("result-picked"),
         resultAccuracy: document.getElementById("result-accuracy"),
+        resultPercentile: document.getElementById("result-percentile"),
         btnNext: document.getElementById("btn-next"),
         finalScore: document.getElementById("final-score"),
         nicknameInput: document.getElementById("nickname-input"),
@@ -200,7 +201,7 @@
         showScreen("game");
     }
 
-    function confirmPick() {
+    async function confirmPick() {
         const accuracy = calcAccuracy(
             state.targetHue,
             state.targetSat,
@@ -212,6 +213,7 @@
         els.resultTarget.style.background = hslString(state.targetHue, state.targetSat);
         els.resultPicked.style.background = hslString(state.pickedHue, state.pickedSat);
         els.resultAccuracy.textContent = `${accuracy} / 100`;
+        els.resultPercentile.textContent = "";
 
         if (state.round >= TOTAL_ROUNDS) {
             els.btnNext.textContent = "Результат";
@@ -219,6 +221,14 @@
             els.btnNext.textContent = "Далее";
         }
         showScreen("result");
+
+        try {
+            const res = await fetch(`/api/percentile/${accuracy}`);
+            const data = await res.json();
+            els.resultPercentile.textContent = `Лучше чем ${data.percentile}% игроков`;
+        } catch (err) {
+            console.error("Failed to load percentile:", err);
+        }
     }
 
     function afterResult() {

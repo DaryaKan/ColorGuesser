@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from .database import activate_score, add_score, get_leaderboard, get_scores_by_nickname, init_db
+from .database import activate_score, add_score, get_leaderboard, get_round_percentile, get_scores_by_nickname, init_db
 
 
 @asynccontextmanager
@@ -53,6 +53,12 @@ async def activate_user_score(data: ScoreActivate):
     if not ok:
         raise HTTPException(status_code=404, detail="Score not found")
     return {"ok": True}
+
+
+@app.get("/api/percentile/{score}")
+async def percentile(score: int):
+    pct = await get_round_percentile(score)
+    return {"percentile": pct}
 
 
 @app.get("/api/leaderboard")
