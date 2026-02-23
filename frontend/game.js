@@ -204,8 +204,8 @@
         els.roundLabel.textContent = `Раунд ${state.round} / ${TOTAL_ROUNDS}`;
         els.totalScoreLabel.textContent = `Очки: ${state.totalScore}`;
 
-        drawColorWheel();
         showScreen("game");
+        requestAnimationFrame(() => drawColorWheel());
     }
 
     async function confirmPick() {
