@@ -2,8 +2,6 @@
     "use strict";
 
     const TOTAL_ROUNDS = 4;
-    const WHEEL_RADIUS = 150;
-    const WHEEL_CENTER = 150;
 
     const screens = {
         start: document.getElementById("screen-start"),
@@ -54,11 +52,19 @@
 
     // --- Color wheel rendering ---
 
+    function getWheelSize() {
+        const container = els.canvas.parentElement;
+        const size = Math.min(container.clientWidth, container.clientHeight);
+        return size;
+    }
+
     function drawColorWheel() {
+        const size = getWheelSize();
+        const r = Math.floor(size / 2);
+        els.canvas.width = r * 2;
+        els.canvas.height = r * 2;
+
         const ctx = els.canvas.getContext("2d");
-        const cx = WHEEL_CENTER;
-        const cy = WHEEL_CENTER;
-        const r = WHEEL_RADIUS;
         const imageData = ctx.createImageData(r * 2, r * 2);
 
         for (let y = 0; y < r * 2; y++) {
@@ -152,14 +158,15 @@
     function handleWheelInput(e) {
         e.preventDefault();
         const { x, y } = getWheelPosition(e);
-        const dx = x - WHEEL_CENTER;
-        const dy = y - WHEEL_CENTER;
+        const r = els.canvas.width / 2;
+        const dx = x - r;
+        const dy = y - r;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > WHEEL_RADIUS) return;
+        if (dist > r) return;
 
         const angle = Math.atan2(dy, dx);
         state.pickedHue = ((angle * 180) / Math.PI + 360) % 360;
-        state.pickedSat = (dist / WHEEL_RADIUS) * 100;
+        state.pickedSat = (dist / r) * 100;
 
         const rect = els.canvas.getBoundingClientRect();
         const cssX = x / (els.canvas.width / rect.width);
