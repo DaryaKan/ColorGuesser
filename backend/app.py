@@ -1,11 +1,11 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from .database import add_score, get_leaderboard, get_scores_by_nickname, init_db, replace_score
+from .database import activate_score, add_score, get_leaderboard, get_scores_by_nickname, init_db
 
 
 @asynccontextmanager
@@ -27,6 +27,7 @@ app.add_middleware(
 class ScoreSubmission(BaseModel):
     nickname: str = Field(..., min_length=1, max_length=64)
     score: int = Field(..., ge=0, le=400)
+    is_active: bool = True
 
 
 @app.get("/api/scores/{nickname}")
@@ -37,19 +38,21 @@ async def get_user_scores(nickname: str):
 
 @app.post("/api/score")
 async def submit_score(data: ScoreSubmission):
-    entry_id = await add_score(data.nickname, data.score)
+    entry_id = await add_score(data.nickname, data.score, data.is_active)
     return {"ok": True, "id": entry_id}
 
 
-class ScoreReplace(BaseModel):
+class ScoreActivate(BaseModel):
     nickname: str = Field(..., min_length=1, max_length=64)
-    score: int = Field(..., ge=0, le=400)
+    score_id: int
 
 
-@app.put("/api/score")
-async def replace_user_score(data: ScoreReplace):
-    entry_id = await replace_score(data.nickname, data.score)
-    return {"ok": True, "id": entry_id}
+@app.put("/api/score/activate")
+async def activate_user_score(data: ScoreActivate):
+    ok = await activate_score(data.nickname, data.score_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Score not found")
+    return {"ok": True}
 
 
 @app.get("/api/leaderboard")

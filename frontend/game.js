@@ -30,6 +30,7 @@
         nicknameInput: document.getElementById("nickname-input"),
         btnSave: document.getElementById("btn-save"),
         scoreList: document.getElementById("score-list"),
+        btnPickSave: document.getElementById("btn-pick-save"),
         leaderboardBody: document.getElementById("leaderboard-body"),
         btnRestart: document.getElementById("btn-restart"),
     };
@@ -42,6 +43,7 @@
         pickedHue: null,
         pickedSat: null,
         savedNickname: "",
+        selectedScoreId: null,
     };
 
     function showScreen(name) {
@@ -246,24 +248,30 @@
         state.savedNickname = nickname;
 
         els.btnSave.disabled = true;
-        els.btnSave.textContent = "Проверка...";
+        els.btnSave.textContent = "Сохранение...";
 
         try {
-            const res = await fetch(`/api/scores/${encodeURIComponent(nickname)}`);
-            const data = await res.json();
+            const existing = await fetch(`/api/scores/${encodeURIComponent(nickname)}`);
+            const existingData = await existing.json();
 
-            if (data.scores && data.scores.length > 0) {
-                els.btnSave.textContent = "Сохранить результат";
-                els.btnSave.disabled = false;
-                showPickScoreScreen(data.scores);
-                return;
-            }
-
-            await fetch("/api/score", {
+            const saveRes = await fetch("/api/score", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nickname, score: state.totalScore }),
+                body: JSON.stringify({
+                    nickname,
+                    score: state.totalScore,
+                    is_active: !existingData.scores.length,
+                }),
             });
+            const saveData = await saveRes.json();
+            const newId = saveData.id;
+
+            if (existingData.scores.length > 0) {
+                els.btnSave.textContent = "Сохранить результат";
+                els.btnSave.disabled = false;
+                showPickScoreScreen(existingData.scores, newId);
+                return;
+            }
         } catch (err) {
             console.error("Failed to save score:", err);
         }
@@ -273,46 +281,76 @@
         showLeaderboard();
     }
 
-    function showPickScoreScreen(existingScores) {
+    function showPickScoreScreen(existingScores, newId) {
         els.scoreList.innerHTML = "";
+        state.selectedScoreId = null;
+        els.btnPickSave.disabled = true;
 
-        const newOption = createScoreOption(state.totalScore, "Новый результат", true);
+        const newOption = createScoreOption(newId, state.totalScore, "Новый результат", true);
         els.scoreList.appendChild(newOption);
 
-        existingScores.forEach((entry, i) => {
-            const label = `Прошлый результат #${i + 1}`;
-            const option = createScoreOption(entry.score, label, false);
+        existingScores.forEach((entry) => {
+            const label = entry.is_active ? "Текущий в рейтинге" : "Прошлый результат";
+            const option = createScoreOption(entry.id, entry.score, label, false);
+            if (entry.is_active) {
+                selectScoreOption(option, entry.id);
+            }
             els.scoreList.appendChild(option);
         });
 
         showScreen("pickScore");
     }
 
-    function createScoreOption(score, label, isNew) {
+    function createScoreOption(id, score, label, isNew) {
         const div = document.createElement("div");
         div.className = "score-option" + (isNew ? " is-new" : "");
+        div.dataset.scoreId = id;
         div.innerHTML = `
             <div>
                 <div class="score-label">${escapeHtml(label)}</div>
                 <div class="score-value">${score} / ${TOTAL_ROUNDS * 100}</div>
             </div>
         `;
-        div.addEventListener("click", () => pickScore(score));
+        div.addEventListener("click", () => selectScoreOption(div, id));
         return div;
     }
 
-    async function pickScore(chosenScore) {
-        const nickname = state.savedNickname;
+    function selectScoreOption(element, scoreId) {
+        els.scoreList.querySelectorAll(".score-option").forEach((el) => {
+            el.classList.remove("selected");
+        });
+        element.classList.add("selected");
+        state.selectedScoreId = scoreId;
+        els.btnPickSave.disabled = false;
+    }
+
+    async function confirmPickedScore() {
+        if (state.selectedScoreId === null) return;
+
+        els.btnPickSave.disabled = true;
+        els.btnPickSave.textContent = "Сохранение...";
+
         try {
-            await fetch("/api/score", {
+            await fetch("/api/score/activate", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nickname, score: chosenScore }),
+                body: JSON.stringify({
+                    nickname: state.savedNickname,
+                    score_id: state.selectedScoreId,
+                }),
             });
-            state.totalScore = chosenScore;
+
+            const selectedEl = els.scoreList.querySelector(`.score-option[data-score-id="${state.selectedScoreId}"]`);
+            if (selectedEl) {
+                const valueText = selectedEl.querySelector(".score-value").textContent;
+                state.totalScore = parseInt(valueText, 10);
+            }
         } catch (err) {
-            console.error("Failed to replace score:", err);
+            console.error("Failed to activate score:", err);
         }
+
+        els.btnPickSave.textContent = "Сохранить";
+        els.btnPickSave.disabled = false;
         showLeaderboard();
     }
 
@@ -359,6 +397,7 @@
     els.btnConfirm.addEventListener("click", confirmPick);
     els.btnNext.addEventListener("click", afterResult);
     els.btnSave.addEventListener("click", saveScore);
+    els.btnPickSave.addEventListener("click", confirmPickedScore);
     els.btnRestart.addEventListener("click", startGame);
 
     els.nicknameInput.addEventListener("input", () => {

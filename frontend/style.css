@@ -331,8 +331,16 @@ h2 {
     font-weight: 700;
 }
 
+.score-option.selected {
+    border-color: #fff;
+}
+
 .score-option.is-new {
     border-color: #666;
+}
+
+.score-option.is-new.selected {
+    border-color: #fff;
 }
 
 .score-option.is-new .score-label {
