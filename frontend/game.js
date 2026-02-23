@@ -64,9 +64,9 @@
 
     function updateBackCards() {
         const remaining = TOTAL_ROUNDS - state.round;
-        els.cardBack1.classList.toggle("hide", remaining < 2);
-        els.cardBack2.classList.toggle("hide", remaining < 3);
-        els.cardBack3.classList.toggle("hide", remaining < 4);
+        els.cardBack1.classList.toggle("hide", remaining < 1);
+        els.cardBack2.classList.toggle("hide", remaining < 2);
+        els.cardBack3.classList.toggle("hide", remaining < 3);
     }
 
     // --- Color wheel rendering ---
