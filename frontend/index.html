@@ -15,42 +15,47 @@
         <button id="btn-start" class="btn">Начать игру</button>
     </div>
 
-    <!-- Round mini-cards (persist across screens) -->
-    <div id="round-cards" class="round-cards"></div>
-
-    <!-- Screen: Game -->
-    <div id="screen-game" class="screen">
-        <div class="game-header">
-            <span id="round-label">Раунд 1 / 4</span>
-            <span id="total-score-label">Очки: 0</span>
-        </div>
-        <div class="target-section">
-            <p class="target-label">Найди этот цвет:</p>
-            <div id="target-color" class="color-swatch"></div>
-        </div>
-        <div class="wheel-container">
-            <canvas id="color-wheel"></canvas>
-            <div id="picker-cursor" class="picker-cursor hidden"></div>
-        </div>
-        <button id="btn-confirm" class="btn" disabled>Подтвердить</button>
-    </div>
-
-    <!-- Screen: Round Result -->
-    <div id="screen-result" class="screen">
-        <h2>Результат раунда</h2>
-        <div class="result-colors">
-            <div class="result-color-block">
-                <div id="result-target" class="color-swatch"></div>
-                <span>Задание</span>
+    <!-- Screen: Card Stack (Game + Result) -->
+    <div id="screen-cards" class="screen">
+        <div class="card-stack" id="card-stack">
+            <div class="card-back card-back-2"></div>
+            <div class="card-back card-back-1"></div>
+            <div class="card-front" id="card-front">
+                <!-- Game content -->
+                <div id="card-game" class="card-content">
+                    <div class="game-header">
+                        <span id="round-label">Раунд 1 / 4</span>
+                        <span id="total-score-label">Очки: 0</span>
+                    </div>
+                    <div class="target-section">
+                        <p class="target-label">Найди этот цвет:</p>
+                        <div id="target-color" class="color-swatch"></div>
+                    </div>
+                    <div class="wheel-container">
+                        <canvas id="color-wheel"></canvas>
+                        <div id="picker-cursor" class="picker-cursor hidden"></div>
+                    </div>
+                    <button id="btn-confirm" class="btn" disabled>Подтвердить</button>
+                </div>
+                <!-- Result content -->
+                <div id="card-result" class="card-content" style="display:none">
+                    <h2>Результат раунда</h2>
+                    <div class="result-colors">
+                        <div class="result-color-block">
+                            <div id="result-target" class="color-swatch"></div>
+                            <span>Задание</span>
+                        </div>
+                        <div class="result-color-block">
+                            <div id="result-picked" class="color-swatch"></div>
+                            <span>Твой выбор</span>
+                        </div>
+                    </div>
+                    <p id="result-accuracy" class="accuracy-text"></p>
+                    <p id="result-percentile" class="percentile-text"></p>
+                    <button id="btn-next" class="btn">Далее</button>
+                </div>
             </div>
-            <div class="result-color-block">
-                <div id="result-picked" class="color-swatch"></div>
-                <span>Твой выбор</span>
-            </div>
         </div>
-        <p id="result-accuracy" class="accuracy-text"></p>
-        <p id="result-percentile" class="percentile-text"></p>
-        <button id="btn-next" class="btn">Далее</button>
     </div>
 
     <!-- Screen: Name Input -->

@@ -5,8 +5,7 @@
 
     const screens = {
         start: document.getElementById("screen-start"),
-        game: document.getElementById("screen-game"),
-        result: document.getElementById("screen-result"),
+        cards: document.getElementById("screen-cards"),
         name: document.getElementById("screen-name"),
         pickScore: document.getElementById("screen-pick-score"),
         leaderboard: document.getElementById("screen-leaderboard"),
@@ -14,6 +13,12 @@
 
     const els = {
         btnStart: document.getElementById("btn-start"),
+        cardStack: document.getElementById("card-stack"),
+        cardFront: document.getElementById("card-front"),
+        cardGame: document.getElementById("card-game"),
+        cardResult: document.getElementById("card-result"),
+        cardBack1: document.querySelector(".card-back-1"),
+        cardBack2: document.querySelector(".card-back-2"),
         roundLabel: document.getElementById("round-label"),
         totalScoreLabel: document.getElementById("total-score-label"),
         targetColor: document.getElementById("target-color"),
@@ -34,8 +39,6 @@
         btnRestart: document.getElementById("btn-restart"),
     };
 
-    const roundCardsContainer = document.getElementById("round-cards");
-
     let state = {
         round: 0,
         totalScore: 0,
@@ -53,6 +56,17 @@
         screens[name].classList.add("active");
     }
 
+    function showCardContent(which) {
+        els.cardGame.style.display = which === "game" ? "flex" : "none";
+        els.cardResult.style.display = which === "result" ? "flex" : "none";
+    }
+
+    function updateBackCards() {
+        const remaining = TOTAL_ROUNDS - state.round;
+        els.cardBack1.classList.toggle("hide", remaining < 2);
+        els.cardBack2.classList.toggle("hide", remaining < 3);
+    }
+
     // --- Color wheel rendering ---
 
     function getWheelSize() {
@@ -64,6 +78,7 @@
     function drawColorWheel() {
         const size = getWheelSize();
         const r = Math.floor(size / 2);
+        if (r <= 0) return;
         els.canvas.width = r * 2;
         els.canvas.height = r * 2;
 
@@ -116,34 +131,26 @@
         return `hsl(${h}, ${s}%, 50%)`;
     }
 
-    // --- Random target color generation ---
-
     function generateTarget() {
         state.targetHue = Math.floor(Math.random() * 360);
         state.targetSat = 30 + Math.floor(Math.random() * 70);
     }
 
-    // --- Accuracy calculation ---
-
     function calcAccuracy(targetH, targetS, pickedH, pickedS) {
         let hueDiff = Math.abs(targetH - pickedH);
         if (hueDiff > 180) hueDiff = 360 - hueDiff;
-
         const satDiff = Math.abs(targetS - pickedS);
-
         const hueScore = Math.max(0, 100 - (hueDiff / 180) * 100);
         const satScore = Math.max(0, 100 - satDiff);
-
         return Math.round(hueScore * 0.7 + satScore * 0.3);
     }
 
-    // --- Pointer handling on the color wheel ---
+    // --- Pointer handling ---
 
     function getWheelPosition(e) {
         const rect = els.canvas.getBoundingClientRect();
         const scaleX = els.canvas.width / rect.width;
         const scaleY = els.canvas.height / rect.height;
-
         let clientX, clientY;
         if (e.touches) {
             clientX = e.touches[0].clientX;
@@ -152,10 +159,10 @@
             clientX = e.clientX;
             clientY = e.clientY;
         }
-
-        const x = (clientX - rect.left) * scaleX;
-        const y = (clientY - rect.top) * scaleY;
-        return { x, y };
+        return {
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY,
+        };
     }
 
     function handleWheelInput(e) {
@@ -167,16 +174,12 @@
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist > r) return;
 
-        const angle = Math.atan2(dy, dx);
-        state.pickedHue = ((angle * 180) / Math.PI + 360) % 360;
+        state.pickedHue = ((Math.atan2(dy, dx) * 180) / Math.PI + 360) % 360;
         state.pickedSat = (dist / r) * 100;
 
         const rect = els.canvas.getBoundingClientRect();
-        const cssX = x / (els.canvas.width / rect.width);
-        const cssY = y / (els.canvas.height / rect.height);
-
-        els.pickerCursor.style.left = cssX + "px";
-        els.pickerCursor.style.top = cssY + "px";
+        els.pickerCursor.style.left = x / (els.canvas.width / rect.width) + "px";
+        els.pickerCursor.style.top = y / (els.canvas.height / rect.height) + "px";
         els.pickerCursor.style.background = hslString(state.pickedHue, state.pickedSat);
         els.pickerCursor.classList.remove("hidden");
         els.btnConfirm.disabled = false;
@@ -193,8 +196,8 @@
         state.round = 0;
         state.totalScore = 0;
         state.roundScores = [];
-        roundCardsContainer.innerHTML = "";
-        roundCardsContainer.style.display = "flex";
+        els.cardBack1.classList.remove("hide");
+        els.cardBack2.classList.remove("hide");
         nextRound();
     }
 
@@ -210,16 +213,24 @@
         els.roundLabel.textContent = `Раунд ${state.round} / ${TOTAL_ROUNDS}`;
         els.totalScoreLabel.textContent = `Очки: ${state.totalScore}`;
 
-        showScreen("game");
-        requestAnimationFrame(() => drawColorWheel());
+        updateBackCards();
+        showCardContent("game");
+
+        els.cardFront.classList.remove("fly-away", "fade-in");
+        els.cardFront.style.transform = "";
+        els.cardFront.style.opacity = "";
+
+        showScreen("cards");
+        requestAnimationFrame(() => {
+            els.cardFront.classList.add("fade-in");
+            drawColorWheel();
+        });
     }
 
     async function confirmPick() {
         const accuracy = calcAccuracy(
-            state.targetHue,
-            state.targetSat,
-            state.pickedHue,
-            state.pickedSat
+            state.targetHue, state.targetSat,
+            state.pickedHue, state.pickedSat
         );
         state.totalScore += accuracy;
         state.roundScores.push(accuracy);
@@ -229,15 +240,9 @@
         els.resultAccuracy.textContent = `${accuracy} / 100`;
         els.resultPercentile.textContent = "";
 
-        if (state.round >= TOTAL_ROUNDS) {
-            els.btnNext.textContent = "Результат";
-        } else {
-            els.btnNext.textContent = "Далее";
-        }
+        els.btnNext.textContent = state.round >= TOTAL_ROUNDS ? "Результат" : "Далее";
 
-        screens.result.classList.remove("fly-away", "fade-in");
-        showScreen("result");
-        requestAnimationFrame(() => screens.result.classList.add("fade-in"));
+        showCardContent("result");
 
         try {
             const res = await fetch(`/api/percentile/${accuracy}`);
@@ -248,28 +253,17 @@
         }
     }
 
-    function addRoundCard(score) {
-        const card = document.createElement("div");
-        card.className = "round-card";
-        card.textContent = score;
-        roundCardsContainer.appendChild(card);
-    }
-
     function afterResult() {
-        const lastScore = state.roundScores[state.roundScores.length - 1];
+        els.cardFront.classList.remove("fade-in");
+        void els.cardFront.offsetWidth;
+        els.cardFront.classList.add("fly-away");
 
-        screens.result.classList.remove("fade-in");
-        void screens.result.offsetWidth;
-        screens.result.classList.add("fly-away");
-
-        screens.result.addEventListener("animationend", function onEnd() {
-            screens.result.removeEventListener("animationend", onEnd);
-            screens.result.classList.remove("fly-away");
-
-            addRoundCard(lastScore);
+        els.cardFront.addEventListener("transitionend", function onEnd(e) {
+            if (e.target !== els.cardFront) return;
+            els.cardFront.removeEventListener("transitionend", onEnd);
+            els.cardFront.classList.remove("fly-away");
 
             if (state.round >= TOTAL_ROUNDS) {
-                roundCardsContainer.style.display = "none";
                 showNameScreen();
             } else {
                 nextRound();
@@ -277,15 +271,15 @@
         });
     }
 
+    // --- Post-game ---
+
     function showNameScreen() {
         els.finalScore.textContent = `${state.totalScore} / ${TOTAL_ROUNDS * 100}`;
-
         const tg = window.Telegram && window.Telegram.WebApp;
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
             const user = tg.initDataUnsafe.user;
             els.nicknameInput.value = user.username || user.first_name || "";
         }
-
         els.btnSave.disabled = !els.nicknameInput.value.trim();
         showScreen("name");
     }
@@ -294,14 +288,12 @@
         const nickname = els.nicknameInput.value.trim();
         if (!nickname) return;
         state.savedNickname = nickname;
-
         els.btnSave.disabled = true;
         els.btnSave.textContent = "Сохранение...";
 
         try {
             const existing = await fetch(`/api/scores/${encodeURIComponent(nickname)}`);
             const existingData = await existing.json();
-
             const saveRes = await fetch("/api/score", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -312,18 +304,15 @@
                 }),
             });
             const saveData = await saveRes.json();
-            const newId = saveData.id;
-
             if (existingData.scores.length > 0) {
                 els.btnSave.textContent = "Сохранить результат";
                 els.btnSave.disabled = false;
-                showPickScoreScreen(existingData.scores, newId);
+                showPickScoreScreen(existingData.scores, saveData.id);
                 return;
             }
         } catch (err) {
             console.error("Failed to save score:", err);
         }
-
         els.btnSave.textContent = "Сохранить результат";
         els.btnSave.disabled = false;
         showLeaderboard();
@@ -333,19 +322,14 @@
         els.scoreList.innerHTML = "";
         state.selectedScoreId = null;
         els.btnPickSave.disabled = true;
-
         const newOption = createScoreOption(newId, state.totalScore, "Новый результат", true);
         els.scoreList.appendChild(newOption);
-
         existingScores.forEach((entry) => {
             const label = entry.is_active ? "Текущий в рейтинге" : "Прошлый результат";
             const option = createScoreOption(entry.id, entry.score, label, false);
-            if (entry.is_active) {
-                selectScoreOption(option, entry.id);
-            }
+            if (entry.is_active) selectScoreOption(option, entry.id);
             els.scoreList.appendChild(option);
         });
-
         showScreen("pickScore");
     }
 
@@ -353,20 +337,16 @@
         const div = document.createElement("div");
         div.className = "score-option" + (isNew ? " is-new" : "");
         div.dataset.scoreId = id;
-        div.innerHTML = `
-            <div>
-                <div class="score-label">${escapeHtml(label)}</div>
-                <div class="score-value">${score} / ${TOTAL_ROUNDS * 100}</div>
-            </div>
-        `;
+        div.innerHTML = `<div>
+            <div class="score-label">${escapeHtml(label)}</div>
+            <div class="score-value">${score} / ${TOTAL_ROUNDS * 100}</div>
+        </div>`;
         div.addEventListener("click", () => selectScoreOption(div, id));
         return div;
     }
 
     function selectScoreOption(element, scoreId) {
-        els.scoreList.querySelectorAll(".score-option").forEach((el) => {
-            el.classList.remove("selected");
-        });
+        els.scoreList.querySelectorAll(".score-option").forEach((el) => el.classList.remove("selected"));
         element.classList.add("selected");
         state.selectedScoreId = scoreId;
         els.btnPickSave.disabled = false;
@@ -374,29 +354,19 @@
 
     async function confirmPickedScore() {
         if (state.selectedScoreId === null) return;
-
         els.btnPickSave.disabled = true;
         els.btnPickSave.textContent = "Сохранение...";
-
         try {
             await fetch("/api/score/activate", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    nickname: state.savedNickname,
-                    score_id: state.selectedScoreId,
-                }),
+                body: JSON.stringify({ nickname: state.savedNickname, score_id: state.selectedScoreId }),
             });
-
             const selectedEl = els.scoreList.querySelector(`.score-option[data-score-id="${state.selectedScoreId}"]`);
-            if (selectedEl) {
-                const valueText = selectedEl.querySelector(".score-value").textContent;
-                state.totalScore = parseInt(valueText, 10);
-            }
+            if (selectedEl) state.totalScore = parseInt(selectedEl.querySelector(".score-value").textContent, 10);
         } catch (err) {
             console.error("Failed to activate score:", err);
         }
-
         els.btnPickSave.textContent = "Сохранить";
         els.btnPickSave.disabled = false;
         showLeaderboard();
@@ -418,17 +388,10 @@
         tbody.innerHTML = "";
         entries.forEach((entry) => {
             const tr = document.createElement("tr");
-            if (
-                entry.nickname === state.savedNickname &&
-                entry.score === state.totalScore
-            ) {
+            if (entry.nickname === state.savedNickname && entry.score === state.totalScore) {
                 tr.classList.add("highlight");
             }
-            tr.innerHTML = `
-                <td>${entry.rank}</td>
-                <td>${escapeHtml(entry.nickname)}</td>
-                <td>${entry.score}</td>
-            `;
+            tr.innerHTML = `<td>${entry.rank}</td><td>${escapeHtml(entry.nickname)}</td><td>${entry.score}</td>`;
             tbody.appendChild(tr);
         });
     }
@@ -452,16 +415,12 @@
         els.btnSave.disabled = !els.nicknameInput.value.trim();
     });
 
-    // Prevent page scroll on touch, but allow scrolling inside scrollable areas
     document.addEventListener("touchmove", (e) => {
         if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
         let node = e.target;
         while (node && node !== document.body) {
             const style = window.getComputedStyle(node);
-            const overflowY = style.overflowY;
-            if ((overflowY === "auto" || overflowY === "scroll") && node.scrollHeight > node.clientHeight) {
-                return;
-            }
+            if ((style.overflowY === "auto" || style.overflowY === "scroll") && node.scrollHeight > node.clientHeight) return;
             node = node.parentElement;
         }
         e.preventDefault();
@@ -469,7 +428,6 @@
 
     document.addEventListener("contextmenu", (e) => e.preventDefault());
 
-    // Telegram WebApp integration
     const tg = window.Telegram && window.Telegram.WebApp;
     if (tg) {
         tg.ready();
