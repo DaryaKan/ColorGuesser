@@ -19,6 +19,7 @@
         cardResult: document.getElementById("card-result"),
         cardBack1: document.querySelector(".card-back-1"),
         cardBack2: document.querySelector(".card-back-2"),
+        cardBack3: document.querySelector(".card-back-3"),
         roundLabel: document.getElementById("round-label"),
         totalScoreLabel: document.getElementById("total-score-label"),
         targetColor: document.getElementById("target-color"),
@@ -65,6 +66,7 @@
         const remaining = TOTAL_ROUNDS - state.round;
         els.cardBack1.classList.toggle("hide", remaining < 2);
         els.cardBack2.classList.toggle("hide", remaining < 3);
+        els.cardBack3.classList.toggle("hide", remaining < 4);
     }
 
     // --- Color wheel rendering ---
@@ -198,6 +200,7 @@
         state.roundScores = [];
         els.cardBack1.classList.remove("hide");
         els.cardBack2.classList.remove("hide");
+        els.cardBack3.classList.remove("hide");
         nextRound();
     }
 

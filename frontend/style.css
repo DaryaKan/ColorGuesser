@@ -124,15 +124,21 @@ h2 {
 }
 
 .card-back-1 {
-    transform: translate(-8px, 6px) scale(0.97);
+    transform: translate(-12px, 8px) scale(0.96);
     background: #1e1e1e;
     z-index: 1;
 }
 
 .card-back-2 {
-    transform: translate(-16px, 12px) scale(0.94);
+    transform: translate(-24px, 16px) scale(0.92);
     background: #222;
     z-index: 0;
+}
+
+.card-back-3 {
+    transform: translate(-36px, 24px) scale(0.88);
+    background: #262626;
+    z-index: -1;
 }
 
 .card-back.hide {
