@@ -258,6 +258,8 @@
     function afterResult() {
         const lastScore = state.roundScores[state.roundScores.length - 1];
 
+        screens.result.classList.remove("fade-in");
+        void screens.result.offsetWidth;
         screens.result.classList.add("fly-away");
 
         screens.result.addEventListener("animationend", function onEnd() {
