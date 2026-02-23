@@ -27,6 +27,31 @@ async def add_score(nickname: str, score: int) -> int:
         return cursor.lastrowid
 
 
+async def get_scores_by_nickname(nickname: str) -> list[dict]:
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute(
+            "SELECT id, score, created_at FROM leaderboard WHERE nickname = ? ORDER BY score DESC",
+            (nickname,),
+        )
+        rows = await cursor.fetchall()
+    return [{"id": row["id"], "score": row["score"], "created_at": row["created_at"]} for row in rows]
+
+
+async def replace_score(nickname: str, keep_score: int) -> int:
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "DELETE FROM leaderboard WHERE nickname = ?",
+            (nickname,),
+        )
+        cursor = await db.execute(
+            "INSERT INTO leaderboard (nickname, score) VALUES (?, ?)",
+            (nickname, keep_score),
+        )
+        await db.commit()
+        return cursor.lastrowid
+
+
 async def get_leaderboard(limit: int = 50) -> list[dict]:
     async with aiosqlite.connect(DB_PATH) as db:
         db.row_factory = aiosqlite.Row

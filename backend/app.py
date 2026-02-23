@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from .database import add_score, get_leaderboard, init_db
+from .database import add_score, get_leaderboard, get_scores_by_nickname, init_db, replace_score
 
 
 @asynccontextmanager
@@ -29,9 +29,26 @@ class ScoreSubmission(BaseModel):
     score: int = Field(..., ge=0, le=400)
 
 
+@app.get("/api/scores/{nickname}")
+async def get_user_scores(nickname: str):
+    scores = await get_scores_by_nickname(nickname)
+    return {"scores": scores}
+
+
 @app.post("/api/score")
 async def submit_score(data: ScoreSubmission):
     entry_id = await add_score(data.nickname, data.score)
+    return {"ok": True, "id": entry_id}
+
+
+class ScoreReplace(BaseModel):
+    nickname: str = Field(..., min_length=1, max_length=64)
+    score: int = Field(..., ge=0, le=400)
+
+
+@app.put("/api/score")
+async def replace_user_score(data: ScoreReplace):
+    entry_id = await replace_score(data.nickname, data.score)
     return {"ok": True, "id": entry_id}
 
 

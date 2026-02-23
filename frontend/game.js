@@ -10,6 +10,7 @@
         game: document.getElementById("screen-game"),
         result: document.getElementById("screen-result"),
         name: document.getElementById("screen-name"),
+        pickScore: document.getElementById("screen-pick-score"),
         leaderboard: document.getElementById("screen-leaderboard"),
     };
 
@@ -28,6 +29,7 @@
         finalScore: document.getElementById("final-score"),
         nicknameInput: document.getElementById("nickname-input"),
         btnSave: document.getElementById("btn-save"),
+        scoreList: document.getElementById("score-list"),
         leaderboardBody: document.getElementById("leaderboard-body"),
         btnRestart: document.getElementById("btn-restart"),
     };
@@ -244,9 +246,19 @@
         state.savedNickname = nickname;
 
         els.btnSave.disabled = true;
-        els.btnSave.textContent = "Сохранение...";
+        els.btnSave.textContent = "Проверка...";
 
         try {
+            const res = await fetch(`/api/scores/${encodeURIComponent(nickname)}`);
+            const data = await res.json();
+
+            if (data.scores && data.scores.length > 0) {
+                els.btnSave.textContent = "Сохранить результат";
+                els.btnSave.disabled = false;
+                showPickScoreScreen(data.scores);
+                return;
+            }
+
             await fetch("/api/score", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -257,6 +269,50 @@
         }
 
         els.btnSave.textContent = "Сохранить результат";
+        els.btnSave.disabled = false;
+        showLeaderboard();
+    }
+
+    function showPickScoreScreen(existingScores) {
+        els.scoreList.innerHTML = "";
+
+        const newOption = createScoreOption(state.totalScore, "Новый результат", true);
+        els.scoreList.appendChild(newOption);
+
+        existingScores.forEach((entry, i) => {
+            const label = `Прошлый результат #${i + 1}`;
+            const option = createScoreOption(entry.score, label, false);
+            els.scoreList.appendChild(option);
+        });
+
+        showScreen("pickScore");
+    }
+
+    function createScoreOption(score, label, isNew) {
+        const div = document.createElement("div");
+        div.className = "score-option" + (isNew ? " is-new" : "");
+        div.innerHTML = `
+            <div>
+                <div class="score-label">${escapeHtml(label)}</div>
+                <div class="score-value">${score} / ${TOTAL_ROUNDS * 100}</div>
+            </div>
+        `;
+        div.addEventListener("click", () => pickScore(score));
+        return div;
+    }
+
+    async function pickScore(chosenScore) {
+        const nickname = state.savedNickname;
+        try {
+            await fetch("/api/score", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nickname, score: chosenScore }),
+            });
+            state.totalScore = chosenScore;
+        } catch (err) {
+            console.error("Failed to replace score:", err);
+        }
         showLeaderboard();
     }
 
@@ -312,7 +368,7 @@
     // Prevent page scroll on touch (long tap, swipe, overscroll)
     document.addEventListener("touchmove", (e) => {
         const tag = e.target.tagName;
-        const isScrollable = e.target.closest(".leaderboard-wrapper");
+        const isScrollable = e.target.closest(".leaderboard-wrapper") || e.target.closest(".score-list");
         if (!isScrollable && tag !== "INPUT") e.preventDefault();
     }, { passive: false });
 

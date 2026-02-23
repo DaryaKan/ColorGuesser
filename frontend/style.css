@@ -271,3 +271,54 @@ h2 {
     background: var(--border);
     border-radius: 2px;
 }
+
+.pick-score-hint {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.score-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+    max-height: 50vh;
+    overflow-y: auto;
+    overscroll-behavior: none;
+}
+
+.score-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.score-option:active {
+    transform: scale(0.98);
+}
+
+.score-option .score-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.score-option .score-value {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.score-option.is-new {
+    border-color: #666;
+}
+
+.score-option.is-new .score-label {
+    color: var(--text);
+}
