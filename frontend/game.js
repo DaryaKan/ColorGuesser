@@ -309,6 +309,15 @@
         els.btnSave.disabled = !els.nicknameInput.value.trim();
     });
 
+    // Prevent page scroll on touch (long tap, swipe, overscroll)
+    document.addEventListener("touchmove", (e) => {
+        const tag = e.target.tagName;
+        const isScrollable = e.target.closest(".leaderboard-wrapper");
+        if (!isScrollable && tag !== "INPUT") e.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
+
     // Telegram WebApp integration
     const tg = window.Telegram && window.Telegram.WebApp;
     if (tg) {
