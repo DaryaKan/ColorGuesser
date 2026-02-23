@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Угадай цвет</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Screen: Start -->
+    <div id="screen-start" class="screen active">
+        <h1>Угадай цвет</h1>
+        <p class="subtitle">Найди нужный цвет на цветовом круге</p>
+        <button id="btn-start" class="btn">Начать игру</button>
+    </div>
+
+    <!-- Screen: Game -->
+    <div id="screen-game" class="screen">
+        <div class="game-header">
+            <span id="round-label">Раунд 1 / 4</span>
+            <span id="total-score-label">Очки: 0</span>
+        </div>
+        <div class="target-section">
+            <p class="target-label">Найди этот цвет:</p>
+            <div id="target-color" class="color-swatch"></div>
+        </div>
+        <div class="wheel-container">
+            <canvas id="color-wheel" width="300" height="300"></canvas>
+            <div id="picker-cursor" class="picker-cursor hidden"></div>
+        </div>
+        <button id="btn-confirm" class="btn" disabled>Подтвердить</button>
+    </div>
+
+    <!-- Screen: Round Result -->
+    <div id="screen-result" class="screen">
+        <h2>Результат раунда</h2>
+        <div class="result-colors">
+            <div class="result-color-block">
+                <div id="result-target" class="color-swatch"></div>
+                <span>Задание</span>
+            </div>
+            <div class="result-color-block">
+                <div id="result-picked" class="color-swatch"></div>
+                <span>Твой выбор</span>
+            </div>
+        </div>
+        <p id="result-accuracy" class="accuracy-text"></p>
+        <button id="btn-next" class="btn">Далее</button>
+    </div>
+
+    <!-- Screen: Name Input -->
+    <div id="screen-name" class="screen">
+        <h2>Игра окончена!</h2>
+        <p id="final-score" class="final-score-text"></p>
+        <div class="name-input-group">
+            <label for="nickname-input">Твой ник:</label>
+            <input id="nickname-input" type="text" maxlength="64" placeholder="Введи имя или ник" autocomplete="off">
+        </div>
+        <button id="btn-save" class="btn" disabled>Сохранить результат</button>
+    </div>
+
+    <!-- Screen: Leaderboard -->
+    <div id="screen-leaderboard" class="screen">
+        <h2>Рейтинг</h2>
+        <div class="leaderboard-wrapper">
+            <table id="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Место</th>
+                        <th>Ник</th>
+                        <th>Очки</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body"></tbody>
+            </table>
+        </div>
+        <button id="btn-restart" class="btn">Играть ещё</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
