@@ -34,6 +34,8 @@
         btnRestart: document.getElementById("btn-restart"),
     };
 
+    const roundCardsContainer = document.getElementById("round-cards");
+
     let state = {
         round: 0,
         totalScore: 0,
@@ -43,6 +45,7 @@
         pickedSat: null,
         savedNickname: "",
         selectedScoreId: null,
+        roundScores: [],
     };
 
     function showScreen(name) {
@@ -189,6 +192,9 @@
     function startGame() {
         state.round = 0;
         state.totalScore = 0;
+        state.roundScores = [];
+        roundCardsContainer.innerHTML = "";
+        roundCardsContainer.style.display = "flex";
         nextRound();
     }
 
@@ -216,6 +222,7 @@
             state.pickedSat
         );
         state.totalScore += accuracy;
+        state.roundScores.push(accuracy);
 
         els.resultTarget.style.background = hslString(state.targetHue, state.targetSat);
         els.resultPicked.style.background = hslString(state.pickedHue, state.pickedSat);
@@ -227,7 +234,10 @@
         } else {
             els.btnNext.textContent = "Далее";
         }
+
+        screens.result.classList.remove("fly-away", "fade-in");
         showScreen("result");
+        requestAnimationFrame(() => screens.result.classList.add("fade-in"));
 
         try {
             const res = await fetch(`/api/percentile/${accuracy}`);
@@ -238,12 +248,31 @@
         }
     }
 
+    function addRoundCard(score) {
+        const card = document.createElement("div");
+        card.className = "round-card";
+        card.textContent = score;
+        roundCardsContainer.appendChild(card);
+    }
+
     function afterResult() {
-        if (state.round >= TOTAL_ROUNDS) {
-            showNameScreen();
-        } else {
-            nextRound();
-        }
+        const lastScore = state.roundScores[state.roundScores.length - 1];
+
+        screens.result.classList.add("fly-away");
+
+        screens.result.addEventListener("animationend", function onEnd() {
+            screens.result.removeEventListener("animationend", onEnd);
+            screens.result.classList.remove("fly-away");
+
+            addRoundCard(lastScore);
+
+            if (state.round >= TOTAL_ROUNDS) {
+                roundCardsContainer.style.display = "none";
+                showNameScreen();
+            } else {
+                nextRound();
+            }
+        });
     }
 
     function showNameScreen() {

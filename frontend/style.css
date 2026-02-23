@@ -100,6 +100,32 @@ h2 {
     cursor: not-allowed;
 }
 
+.round-cards {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    gap: 6px;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.round-card {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--surface);
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
 .game-header {
     display: flex;
     justify-content: space-between;
@@ -160,6 +186,35 @@ h2 {
 
 .picker-cursor.hidden {
     display: none;
+}
+
+#screen-result {
+    transition: none;
+}
+
+#screen-result.fly-away {
+    animation: flyToCorner 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    pointer-events: none;
+}
+
+@keyframes flyToCorner {
+    0% {
+        transform: scale(1) translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.08) translate(-550%, -600%);
+        opacity: 0;
+    }
+}
+
+#screen-result.fade-in {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 .result-colors {
