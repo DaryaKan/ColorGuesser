@@ -223,14 +223,12 @@ h2 {
     color: var(--btn-disabled-text);
 }
 
-#screen-leaderboard::before,
-#screen-leaderboard::after {
-    display: none;
+#screen-leaderboard::before {
+    flex: 0 0 8vh;
 }
 
-#screen-leaderboard {
-    justify-content: flex-start;
-    padding-top: 40px;
+#screen-leaderboard::after {
+    display: none;
 }
 
 .leaderboard-wrapper {
@@ -308,14 +306,12 @@ h2 {
     border-radius: 2px;
 }
 
-#screen-pick-score::before,
-#screen-pick-score::after {
-    display: none;
+#screen-pick-score::before {
+    flex: 0 0 8vh;
 }
 
-#screen-pick-score {
-    justify-content: flex-start;
-    padding-top: 40px;
+#screen-pick-score::after {
+    display: none;
 }
 
 .pick-score-hint {
