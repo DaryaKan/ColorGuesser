@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Угадай цвет</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css">
+    <link rel="preload" href="game.js" as="script">
+    <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
 </head>
 <body>
     <!-- Screen: Start -->
@@ -96,6 +97,6 @@
         <button id="btn-restart" class="btn">Играть ещё</button>
     </div>
 
-    <script src="game.js"></script>
+    <script src="game.js" defer></script>
 </body>
 </html>
