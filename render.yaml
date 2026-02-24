@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: color-guesser
+    runtime: docker
+    plan: free
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: WEBAPP_URL
+        sync: false
+      - key: PORT
+        value: "8000"

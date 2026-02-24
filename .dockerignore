@@ -1,0 +1,7 @@
+__pycache__
+*.pyc
+.git
+game.db
+*.md
+.gitignore
+.dockerignore

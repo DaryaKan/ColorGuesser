@@ -13,48 +13,73 @@
 │   ├── index.html      # Основная страница Mini App
 │   ├── style.css       # Стили (чёрно-белый дизайн)
 │   └── game.js         # Логика игры и цветовой круг
+├── run.py              # Запуск сервера + бота одним процессом
+├── Dockerfile          # Docker-образ для деплоя
+├── Procfile            # Для Railway / Heroku
+├── railway.toml        # Конфиг Railway
+├── render.yaml         # Конфиг Render
 └── requirements.txt
 ```
 
-## Установка
+## Деплой на Railway (рекомендуется)
+
+1. Зайди на [railway.app](https://railway.app) и авторизуйся через GitHub
+2. Нажми **New Project → Deploy from GitHub repo**
+3. Выбери репозиторий `ColorGuesser`
+4. Добавь переменные окружения в Settings → Variables:
+   - `BOT_TOKEN` — токен бота от [@BotFather](https://t.me/BotFather)
+   - `WEBAPP_URL` — оставь пустым, заполнишь после деплоя
+5. Railway задеплоит и даст URL вида `https://xxxxx.up.railway.app`
+6. Скопируй этот URL и вставь в переменную `WEBAPP_URL`
+7. Railway автоматически передеплоит с правильным URL
+
+## Деплой на Render
+
+1. Зайди на [render.com](https://render.com) и авторизуйся через GitHub
+2. Нажми **New → Web Service**
+3. Выбери репозиторий, Runtime: **Docker**
+4. Добавь переменные окружения:
+   - `BOT_TOKEN` — токен бота
+   - `WEBAPP_URL` — URL после деплоя (формат `https://xxxxx.onrender.com`)
+5. Нажми Deploy
+
+## Локальный запуск
+
+### Установка
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Запуск
-
-### 1. Веб-сервер (API + фронтенд)
+### Всё одной командой
 
 ```bash
-uvicorn backend.app:app --host 0.0.0.0 --port 8000
+export BOT_TOKEN="ваш_токен"
+export WEBAPP_URL="https://ваш-домен.com"
+python run.py
 ```
 
-Фронтенд будет доступен на `http://localhost:8000`.
-
-### 2. Telegram-бот
-
-Необходимо задать переменные окружения:
-
-- `BOT_TOKEN` — токен бота от [@BotFather](https://t.me/BotFather)
-- `WEBAPP_URL` — публичный HTTPS URL, на котором размещён фронтенд
+### Или раздельно
 
 ```bash
-export BOT_TOKEN="123456:ABC-DEF..."
-export WEBAPP_URL="https://your-domain.com"
+# Терминал 1 — сервер:
+uvicorn backend.app:app --host 0.0.0.0 --port 8000
+
+# Терминал 2 — бот:
+export BOT_TOKEN="ваш_токен"
+export WEBAPP_URL="https://ваш-домен.com"
 python -m backend.bot
 ```
 
 ### Для разработки (с HTTPS через ngrok)
 
 ```bash
-# В первом терминале:
+# Терминал 1:
 uvicorn backend.app:app --host 0.0.0.0 --port 8000
 
-# Во втором терминале:
+# Терминал 2:
 ngrok http 8000
-
-# Скопируйте HTTPS URL из ngrok и задайте его в WEBAPP_URL
+# Скопируйте HTTPS URL и задайте:
 export WEBAPP_URL="https://xxxx.ngrok-free.app"
 export BOT_TOKEN="ваш_токен"
 python -m backend.bot
