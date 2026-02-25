@@ -130,19 +130,19 @@ html {
 }
 
 .card-back-1 {
-    transform: translate(-10px, 7px) scale(0.97);
+    transform: translate(10px, 7px) scale(0.97);
     background: #d8d8dd;
     z-index: 1;
 }
 
 .card-back-2 {
-    transform: translate(-20px, 14px) scale(0.94);
+    transform: translate(20px, 14px) scale(0.94);
     background: #ccccd1;
     z-index: 0;
 }
 
 .card-back-3 {
-    transform: translate(-30px, 21px) scale(0.91);
+    transform: translate(30px, 21px) scale(0.91);
     background: #c0c0c5;
     z-index: -1;
 }
@@ -160,7 +160,7 @@ html {
 
 .card-front.fly-away {
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
-    transform: scale(0.15) translate(-280%, -300%);
+    transform: scale(0.15) translate(280%, -300%);
     opacity: 0;
     pointer-events: none;
 }
