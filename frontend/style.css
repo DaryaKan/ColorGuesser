@@ -119,8 +119,9 @@ html {
 .card-stack {
     position: relative;
     width: 100%;
-    flex: 1 1 0;
-    min-height: 0;
+    flex: 0 1 auto;
+    aspect-ratio: 0.75;
+    max-height: 65vh;
 }
 
 .card-back,
