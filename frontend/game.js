@@ -4,7 +4,6 @@
     const TOTAL_ROUNDS = 4;
 
     const screens = {
-        start: document.getElementById("screen-start"),
         cards: document.getElementById("screen-cards"),
         name: document.getElementById("screen-name"),
         pickScore: document.getElementById("screen-pick-score"),
@@ -12,7 +11,6 @@
     };
 
     const els = {
-        btnStart: document.getElementById("btn-start"),
         cardStack: document.getElementById("card-stack"),
         cardFront: document.getElementById("card-front"),
         cardGame: document.getElementById("card-game"),
@@ -404,7 +402,6 @@
 
     // --- Event listeners ---
 
-    els.btnStart.addEventListener("click", startGame);
     els.btnConfirm.addEventListener("click", confirmPick);
     els.btnNext.addEventListener("click", afterResult);
     els.btnSave.addEventListener("click", saveScore);
@@ -433,4 +430,6 @@
         tg.ready();
         tg.expand();
     }
+
+    startGame();
 })();
