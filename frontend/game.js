@@ -5,7 +5,6 @@
 
     const screens = {
         cards: document.getElementById("screen-cards"),
-        name: document.getElementById("screen-name"),
         pickScore: document.getElementById("screen-pick-score"),
         leaderboard: document.getElementById("screen-leaderboard"),
     };
@@ -29,9 +28,6 @@
         resultAccuracy: document.getElementById("result-accuracy"),
         resultPercentile: document.getElementById("result-percentile"),
         btnNext: document.getElementById("btn-next"),
-        finalScore: document.getElementById("final-score"),
-        nicknameInput: document.getElementById("nickname-input"),
-        btnSave: document.getElementById("btn-save"),
         scoreList: document.getElementById("score-list"),
         btnPickSave: document.getElementById("btn-pick-save"),
         leaderboardBody: document.getElementById("leaderboard-body"),
@@ -267,7 +263,7 @@
             els.cardFront.classList.remove("fly-away");
 
             if (state.round >= TOTAL_ROUNDS) {
-                showNameScreen();
+                finishGame();
             } else {
                 nextRound();
             }
@@ -276,27 +272,23 @@
 
     // --- Post-game ---
 
-    function showNameScreen() {
-        els.finalScore.textContent = `${state.totalScore} / ${TOTAL_ROUNDS * 100}`;
+    function getNickname() {
         const tg = window.Telegram && window.Telegram.WebApp;
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
             const user = tg.initDataUnsafe.user;
-            els.nicknameInput.value = user.username || user.first_name || "";
+            return user.username || user.first_name || "Player";
         }
-        els.btnSave.disabled = !els.nicknameInput.value.trim();
-        showScreen("name");
+        return "Player";
     }
 
-    async function saveScore() {
-        const nickname = els.nicknameInput.value.trim();
-        if (!nickname) return;
+    async function finishGame() {
+        const nickname = getNickname();
         state.savedNickname = nickname;
-        els.btnSave.disabled = true;
-        els.btnSave.textContent = "Сохранение...";
 
         try {
             const existing = await fetch(`/api/scores/${encodeURIComponent(nickname)}`);
             const existingData = await existing.json();
+
             const saveRes = await fetch("/api/score", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -307,17 +299,14 @@
                 }),
             });
             const saveData = await saveRes.json();
+
             if (existingData.scores.length > 0) {
-                els.btnSave.textContent = "Сохранить результат";
-                els.btnSave.disabled = false;
                 showPickScoreScreen(existingData.scores, saveData.id);
                 return;
             }
         } catch (err) {
             console.error("Failed to save score:", err);
         }
-        els.btnSave.textContent = "Сохранить результат";
-        els.btnSave.disabled = false;
         showLeaderboard();
     }
 
@@ -409,13 +398,8 @@
 
     els.btnConfirm.addEventListener("click", confirmPick);
     els.btnNext.addEventListener("click", afterResult);
-    els.btnSave.addEventListener("click", saveScore);
     els.btnPickSave.addEventListener("click", confirmPickedScore);
     els.btnRestart.addEventListener("click", startGame);
-
-    els.nicknameInput.addEventListener("input", () => {
-        els.btnSave.disabled = !els.nicknameInput.value.trim();
-    });
 
     document.addEventListener("touchmove", (e) => {
         if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
