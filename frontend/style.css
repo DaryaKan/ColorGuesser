@@ -71,6 +71,7 @@ html {
 .screen-cards {
     align-items: stretch;
     padding: 24px 24px 20px;
+    padding-top: calc(env(safe-area-inset-top, 20px) + 48px);
     gap: 12px;
 }
 
