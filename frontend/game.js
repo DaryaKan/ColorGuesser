@@ -434,15 +434,7 @@
     if (tg) {
         tg.ready();
         tg.expand();
-        const applyTopPadding = () => {
-            const top = tg.contentSafeAreaInset
-                ? tg.contentSafeAreaInset.top + tg.safeAreaInset.top
-                : 0;
-            document.querySelector(".screen-cards").style.paddingTop = (top + 16) + "px";
-        };
-        applyTopPadding();
-        tg.onEvent("contentSafeAreaChanged", applyTopPadding);
-        tg.onEvent("safeAreaChanged", applyTopPadding);
+        tg.requestFullscreen && tg.requestFullscreen();
     }
 
     startGame();
