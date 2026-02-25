@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
-from .database import activate_score, add_score, get_leaderboard, get_round_percentile, get_scores_by_nickname, init_db
+from .database import USE_PG, activate_score, add_score, get_leaderboard, get_round_percentile, get_scores_by_nickname, init_db
 
 
 @asynccontextmanager
@@ -75,6 +75,11 @@ async def percentile(score: int):
 async def leaderboard():
     entries = await get_leaderboard()
     return {"entries": entries}
+
+
+@app.get("/api/health")
+async def health():
+    return {"db": "postgresql" if USE_PG else "sqlite"}
 
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
