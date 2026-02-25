@@ -12,16 +12,21 @@ WEBAPP_URL = os.getenv("WEBAPP_URL", "")
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(
-            text="🎨 Играть",
-            web_app=WebAppInfo(url=WEBAPP_URL),
-        )]
-    ])
-    await update.message.reply_text(
-        "Привет! Нажми кнопку ниже, чтобы начать игру «Угадай цвет».",
-        reply_markup=keyboard,
-    )
+    if WEBAPP_URL:
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(
+                text="🎨 Play",
+                web_app=WebAppInfo(url=WEBAPP_URL),
+            )]
+        ])
+        await update.message.reply_text(
+            "Welcome to Color Guesser Game!\nGuess the color on the color wheel. 4 rounds, max 400 points.\n\nTap the button below to play:",
+            reply_markup=keyboard,
+        )
+    else:
+        await update.message.reply_text(
+            "Welcome to Color Guesser Game!\nThe game is being set up. Please try again later.",
+        )
 
 
 async def post_init(application: Application) -> None:
