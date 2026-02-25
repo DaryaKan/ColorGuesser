@@ -75,16 +75,20 @@ html {
 
 .screen-cards {
     align-items: stretch;
+    justify-content: flex-start;
     padding: 16px;
     padding-top: calc(
         var(--tg-content-safe-area-inset-top, 0px)
         + var(--tg-safe-area-inset-top, 0px)
         + 16px
     );
-    gap: 10px;
+    gap: 0;
 }
 
-.screen-cards::before,
+.screen-cards::before {
+    display: none;
+}
+
 .screen-cards::after {
     display: none;
 }
@@ -93,7 +97,7 @@ html {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 6px;
+    flex-shrink: 0;
 }
 
 .page-title h1 {
@@ -117,12 +121,16 @@ html {
 
 /* --- Cards --- */
 
+.spacer {
+    flex: 1 1 0;
+}
+
 .card-stack {
     position: relative;
     width: 100%;
-    flex: 0 1 auto;
+    flex: 0 0 auto;
     aspect-ratio: 0.75;
-    max-height: 65vh;
+    max-height: 60vh;
 }
 
 .card-back,
@@ -251,6 +259,7 @@ html {
     font-weight: 600;
     color: var(--text-secondary);
     padding: 4px 0;
+    flex-shrink: 0;
 }
 
 /* --- Buttons --- */
