@@ -72,9 +72,12 @@
     }
 
     function drawColorWheel() {
-        const size = getWheelSize();
+        const cssSize = getWheelSize();
+        if (cssSize <= 0) return;
+        const dpr = window.devicePixelRatio || 1;
+        const size = Math.floor(cssSize * dpr);
         const r = Math.floor(size / 2);
-        if (r <= 0) return;
+
         els.canvas.width = r * 2;
         els.canvas.height = r * 2;
 
