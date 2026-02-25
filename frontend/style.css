@@ -294,6 +294,13 @@ html {
     border: 1.5px solid var(--border);
 }
 
+.section-subtitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    align-self: flex-start;
+}
+
 /* --- Result --- */
 
 .result-colors {
@@ -370,11 +377,19 @@ h2 {
 
 /* --- Leaderboard --- */
 
-#screen-leaderboard::before {
-    flex: 0 0 6vh;
+.screen-leaderboard {
+    align-items: stretch;
+    padding: 24px 24px 20px;
+    padding-top: calc(
+        var(--tg-content-safe-area-inset-top, 0px)
+        + var(--tg-safe-area-inset-top, 0px)
+        + 16px
+    );
+    gap: 12px;
 }
 
-#screen-leaderboard::after {
+.screen-leaderboard::before,
+.screen-leaderboard::after {
     display: none;
 }
 
