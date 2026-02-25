@@ -18,7 +18,7 @@
         cardBack1: document.querySelector(".card-back-1"),
         cardBack2: document.querySelector(".card-back-2"),
         cardBack3: document.querySelector(".card-back-3"),
-        roundLabel: document.getElementById("round-label"),
+        roundBadge: document.getElementById("round-badge"),
         totalScoreLabel: document.getElementById("total-score-label"),
         targetColor: document.getElementById("target-color"),
         canvas: document.getElementById("color-wheel"),
@@ -211,11 +211,13 @@
 
         generateTarget();
         els.targetColor.style.background = hslString(state.targetHue, state.targetSat);
-        els.roundLabel.textContent = `Раунд ${state.round} / ${TOTAL_ROUNDS}`;
-        els.totalScoreLabel.textContent = `Очки: ${state.totalScore}`;
+        els.roundBadge.textContent = `${state.round} / ${TOTAL_ROUNDS}`;
+        els.totalScoreLabel.textContent = state.totalScore;
 
         updateBackCards();
         showCardContent("game");
+        els.btnConfirm.style.display = "";
+        els.btnNext.style.display = "none";
 
         els.cardFront.classList.remove("fly-away");
         els.cardFront.style.transform = "";
@@ -237,8 +239,11 @@
         els.resultPicked.style.background = hslString(state.pickedHue, state.pickedSat);
         els.resultAccuracy.textContent = `${accuracy} / 100`;
         els.resultPercentile.textContent = "";
+        els.totalScoreLabel.textContent = state.totalScore;
 
         els.btnNext.textContent = state.round >= TOTAL_ROUNDS ? "Результат" : "Далее";
+        els.btnConfirm.style.display = "none";
+        els.btnNext.style.display = "";
 
         showCardContent("result");
 

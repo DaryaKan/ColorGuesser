@@ -9,7 +9,11 @@
 </head>
 <body>
     <!-- Screen: Card Stack (Game + Result) -->
-    <div id="screen-cards" class="screen">
+    <div id="screen-cards" class="screen screen-cards">
+        <div class="page-title">
+            <h1>Угадай<br>цвет</h1>
+            <div class="round-badge" id="round-badge">1 / 4</div>
+        </div>
         <div class="card-stack" id="card-stack">
             <div class="card-back card-back-3"></div>
             <div class="card-back card-back-2"></div>
@@ -17,23 +21,17 @@
             <div class="card-front" id="card-front">
                 <!-- Game content -->
                 <div id="card-game" class="card-content">
-                    <div class="game-header">
-                        <span id="round-label">Раунд 1 / 4</span>
-                        <span id="total-score-label">Очки: 0</span>
-                    </div>
                     <div class="target-section">
-                        <p class="target-label">Найди этот цвет:</p>
                         <div id="target-color" class="color-swatch"></div>
+                        <p class="target-label">Найди этот цвет</p>
                     </div>
                     <div class="wheel-container">
                         <canvas id="color-wheel"></canvas>
                         <div id="picker-cursor" class="picker-cursor hidden"></div>
                     </div>
-                    <button id="btn-confirm" class="btn" disabled>Подтвердить</button>
                 </div>
                 <!-- Result content -->
                 <div id="card-result" class="card-content" style="display:none">
-                    <h2>Результат раунда</h2>
                     <div class="result-colors">
                         <div class="result-color-block">
                             <div id="result-target" class="color-swatch"></div>
@@ -46,9 +44,13 @@
                     </div>
                     <p id="result-accuracy" class="accuracy-text"></p>
                     <p id="result-percentile" class="percentile-text"></p>
-                    <button id="btn-next" class="btn">Далее</button>
                 </div>
             </div>
+        </div>
+        <div class="score-bar">Очки: <span id="total-score-label">0</span></div>
+        <div class="bottom-buttons">
+            <button id="btn-confirm" class="btn btn-primary" disabled>Подтвердить</button>
+            <button id="btn-next" class="btn btn-primary" style="display:none">Далее</button>
         </div>
     </div>
 
@@ -60,7 +62,7 @@
             <label for="nickname-input">Твой ник:</label>
             <input id="nickname-input" type="text" maxlength="64" placeholder="Введи имя или ник" autocomplete="off">
         </div>
-        <button id="btn-save" class="btn" disabled>Сохранить результат</button>
+        <button id="btn-save" class="btn btn-primary" disabled>Сохранить результат</button>
     </div>
 
     <!-- Screen: Pick which score to keep -->
@@ -68,7 +70,7 @@
         <h2>У тебя уже есть результаты</h2>
         <p class="pick-score-hint">Выбери, какой результат оставить в рейтинге:</p>
         <div class="score-list" id="score-list"></div>
-        <button id="btn-pick-save" class="btn" disabled>Сохранить</button>
+        <button id="btn-pick-save" class="btn btn-primary" disabled>Сохранить</button>
     </div>
 
     <!-- Screen: Leaderboard -->
@@ -86,7 +88,7 @@
                 <tbody id="leaderboard-body"></tbody>
             </table>
         </div>
-        <button id="btn-restart" class="btn">Играть ещё</button>
+        <button id="btn-restart" class="btn btn-primary">Играть ещё</button>
     </div>
 
     <script src="game.js"></script>
