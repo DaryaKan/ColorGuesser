@@ -50,8 +50,9 @@
     };
 
     function showScreen(name) {
-        Object.values(screens).forEach((s) => s.classList.remove("active"));
-        screens[name].classList.add("active");
+        Object.values(screens).forEach((s) => { if (s) s.classList.remove("active"); });
+        const target = screens[name];
+        if (target) target.classList.add("active");
     }
 
     function showCardContent(which) {
@@ -266,7 +267,17 @@
         els.totalScoreLabel.textContent = state.totalScore;
 
         if (state.round >= TOTAL_ROUNDS) {
-            await finishGame();
+            var finishTimeout = setTimeout(function () {
+                showLeaderboard();
+            }, 8000);
+            try {
+                await finishGame();
+            } catch (err) {
+                console.error("finishGame error:", err);
+                showLeaderboard();
+            } finally {
+                clearTimeout(finishTimeout);
+            }
             return;
         }
 
@@ -328,7 +339,7 @@
         try {
             const existingRes = await fetch(`/api/scores/${encodeURIComponent(nickname)}`);
             const existingData = await existingRes.json().catch(() => ({}));
-            existingScores = existingData.scores || [];
+            existingScores = Array.isArray(existingData.scores) ? existingData.scores : [];
         } catch (e) {
             console.error("Failed to load scores:", e);
         }
@@ -349,9 +360,14 @@
             console.error("Failed to save score:", err);
         }
 
-        if (existingScores.length > 0 && newScoreId != null) {
-            showPickScoreScreen(existingScores, newScoreId);
-        } else {
+        try {
+            if (existingScores.length > 0 && newScoreId != null) {
+                showPickScoreScreen(existingScores, newScoreId);
+            } else {
+                showLeaderboard();
+            }
+        } catch (e) {
+            console.error("Show screen error:", e);
             showLeaderboard();
         }
     }
@@ -425,8 +441,8 @@
     async function showLeaderboard() {
         try {
             const res = await fetch("/api/leaderboard");
-            const data = await res.json();
-            renderLeaderboard(data.entries);
+            const data = await res.json().catch(() => ({}));
+            renderLeaderboard(Array.isArray(data.entries) ? data.entries : []);
         } catch (err) {
             console.error("Failed to load leaderboard:", err);
         }
