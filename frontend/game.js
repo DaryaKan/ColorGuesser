@@ -68,8 +68,20 @@
 
     function getWheelSize() {
         const container = els.canvas.parentElement;
+        if (!container) return 0;
         const size = Math.min(container.clientWidth, container.clientHeight);
         return size;
+    }
+
+    function scheduleWheelDraw() {
+        function tryDraw() {
+            if (getWheelSize() > 0) {
+                drawColorWheel();
+                return;
+            }
+            requestAnimationFrame(tryDraw);
+        }
+        requestAnimationFrame(tryDraw);
     }
 
     function drawColorWheel() {
@@ -224,7 +236,7 @@
         els.cardFront.style.opacity = "";
 
         showScreen("cards");
-        requestAnimationFrame(() => drawColorWheel());
+        scheduleWheelDraw();
     }
 
     async function confirmPick() {
@@ -430,6 +442,12 @@
     }, { passive: false });
 
     document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    window.addEventListener("resize", function () {
+        if (screens.cards.classList.contains("active") && els.cardGame.style.display !== "none") {
+            scheduleWheelDraw();
+        }
+    });
 
     const tg = window.Telegram && window.Telegram.WebApp;
     if (tg) {

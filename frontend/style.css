@@ -256,12 +256,15 @@ html {
 .wheel-container {
     position: relative;
     width: 100%;
+    max-width: 320px;
     aspect-ratio: 1;
+    min-height: 200px;
     touch-action: none;
     flex-shrink: 1;
 }
 
 #color-wheel {
+    display: block;
     width: 100%;
     height: 100%;
     border-radius: 50%;
