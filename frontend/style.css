@@ -71,6 +71,41 @@ html {
     display: flex;
 }
 
+/* --- Telegram only --- */
+
+.screen-telegram-only {
+    justify-content: center;
+    text-align: center;
+}
+
+.telegram-only-content {
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.telegram-only-content h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.telegram-only-text {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+}
+
+.telegram-only-hint {
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    line-height: 1.4;
+}
+
 /* --- Game screen layout --- */
 
 .screen-cards {
@@ -257,6 +292,7 @@ html {
     font-weight: 600;
     color: var(--text-secondary);
     padding: 4px 0;
+    margin-bottom: 4px;
     flex-shrink: 0;
 }
 

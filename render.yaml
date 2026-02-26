@@ -1,12 +1,13 @@
+# Render Blueprint: только веб — таблица рейтинга (без бота)
+# База данных — на Railway (DATABASE_URL задаётся вручную в Environment)
+
 services:
   - type: web
     name: color-guesser
-    runtime: docker
-    plan: free
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.app:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: BOT_TOKEN
+      - key: DATABASE_URL
         sync: false
-      - key: WEBAPP_URL
-        sync: false
-      - key: PORT
-        value: "8000"
+        # В Dashboard вставь connection string от Railway (Postgres)

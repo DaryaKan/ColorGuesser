@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Color Guesser Game</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <!-- Screen: Open in Telegram only -->
-    <div id="screen-telegram-only" class="screen screen-telegram-only">
+    <!-- Screen: Open in Telegram only (показан по умолчанию, пока не загрузится game.js) -->
+    <div id="screen-telegram-only" class="screen screen-telegram-only active">
         <div class="telegram-only-content">
             <h1>Color guesser</h1>
             <p class="telegram-only-text">Это приложение работает только внутри Telegram.</p>
@@ -96,6 +96,6 @@
         </div>
     </div>
 
-    <script src="game.js"></script>
+    <script src="/static/game.js"></script>
 </body>
 </html>

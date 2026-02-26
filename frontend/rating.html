@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <title>Color Guesser — Рейтинг</title>
+    <style>
+        body { font-family: sans-serif; margin: 1rem; }
+        h1 { font-size: 1.5rem; margin: 0 0 0.25rem 0; }
+        h2 { font-size: 1rem; font-weight: normal; color: #555; margin: 0 0 1rem 0; }
+        table { border-collapse: collapse; width: 100%; max-width: 400px; }
+        th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+        th { background: #f5f5f5; }
+        .hint { font-size: 0.85rem; color: #888; margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+    <h1>Color Guesser</h1>
+    <h2>Рейтинг</h2>
+    <p class="hint">Обновляется каждые 10 сек по данным из базы.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Место</th>
+                <th>Ник</th>
+                <th>Очки</th>
+            </tr>
+        </thead>
+        <tbody id="rating-body"></tbody>
+    </table>
+    <script>
+        (function () {
+            const tbody = document.getElementById("rating-body");
+
+            function escapeHtml(s) {
+                return (s || "").replace(/[&<>"']/g, function (c) {
+                    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+                });
+            }
+
+            function render(entries) {
+                tbody.innerHTML = "";
+                if (entries.length === 0) {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = "<td colspan=\"3\">Пока нет записей</td>";
+                    tbody.appendChild(tr);
+                } else {
+                    entries.forEach(function (entry) {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = "<td>" + (entry.rank || "") + "</td><td>" + escapeHtml(entry.nickname) + "</td><td>" + (entry.score ?? "") + "</td>";
+                        tbody.appendChild(tr);
+                    });
+                }
+            }
+
+            function load() {
+                fetch("/api/leaderboard")
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) { render(data.entries || []); })
+                    .catch(function () {
+                        tbody.innerHTML = "";
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = "<td colspan=\"3\">Не удалось загрузить рейтинг</td>";
+                        tbody.appendChild(tr);
+                    });
+            }
+
+            load();
+            setInterval(load, 10000);
+        })();
+    </script>
+</body>
+</html>
