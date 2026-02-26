@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
@@ -87,6 +88,12 @@ async def deactivate_user_scores(nickname: str):
 @app.get("/api/health")
 async def health():
     return {"db": "postgresql" if USE_PG else "sqlite"}
+
+
+@app.get("/rating")
+async def rating_page():
+    """Public rating page - read-only leaderboard view"""
+    return FileResponse("frontend/rating.html")
 
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
