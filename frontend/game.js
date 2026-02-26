@@ -318,14 +318,26 @@
         els.scoreList.innerHTML = "";
         state.selectedScoreId = null;
         els.btnPickSave.disabled = true;
-        const newOption = createScoreOption(newId, state.totalScore, "Новый результат", true);
-        els.scoreList.appendChild(newOption);
-        existingScores.forEach((entry) => {
-            const label = entry.is_active ? "Текущий в рейтинге" : "Прошлый результат";
-            const option = createScoreOption(entry.id, entry.score, label, false);
-            if (entry.is_active) selectScoreOption(option, entry.id);
+
+        const allScores = [
+            { id: newId, score: state.totalScore, label: "Новый результат", isNew: true },
+            ...existingScores.map((e) => ({
+                id: e.id,
+                score: e.score,
+                label: e.is_active ? "Текущий в рейтинге" : "Прошлый результат",
+                isNew: false,
+            })),
+        ];
+
+        allScores.sort((a, b) => b.score - a.score);
+
+        let bestId = allScores[0].id;
+        allScores.forEach((entry) => {
+            const option = createScoreOption(entry.id, entry.score, entry.label, entry.isNew);
+            if (entry.id === bestId) selectScoreOption(option, entry.id);
             els.scoreList.appendChild(option);
         });
+
         showScreen("pickScore");
     }
 
