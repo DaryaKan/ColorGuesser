@@ -256,8 +256,6 @@
         els.totalScoreLabel.textContent = state.totalScore;
 
         if (state.round >= TOTAL_ROUNDS) {
-            els.btnConfirm.disabled = true;
-            els.btnConfirm.textContent = "…";
             await finishGame();
             return;
         }
