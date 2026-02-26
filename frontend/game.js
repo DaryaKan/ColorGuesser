@@ -255,10 +255,14 @@
         els.resultPercentile.textContent = "";
         els.totalScoreLabel.textContent = state.totalScore;
 
-        els.btnNext.textContent = state.round >= TOTAL_ROUNDS ? "Результат" : "Далее";
+        if (state.round >= TOTAL_ROUNDS) {
+            finishGame();
+            return;
+        }
+
+        els.btnNext.textContent = "Далее";
         els.btnConfirm.style.display = "none";
         els.btnNext.style.display = "";
-
         showCardContent("result");
         els.cardResult.style.visibility = "visible";
         els.cardResult.style.opacity = "1";
