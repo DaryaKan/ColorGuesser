@@ -64,6 +64,12 @@ if USE_PG:
                 await conn.execute("UPDATE scores SET is_active = TRUE WHERE id = $1 AND nickname = $2", score_id, nickname)
             return True
 
+    async def deactivate_all(nickname: str) -> bool:
+        pool = await _get_pool()
+        async with pool.acquire() as conn:
+            result = await conn.execute("UPDATE scores SET is_active = FALSE WHERE nickname = $1", nickname)
+            return "UPDATE" in result
+
     async def get_round_percentile(round_score: int, total_rounds: int = 4) -> int:
         pool = await _get_pool()
         async with pool.acquire() as conn:
@@ -136,6 +142,12 @@ else:
                 return False
             await db.execute("UPDATE scores SET is_active = 0 WHERE nickname = ?", (nickname,))
             await db.execute("UPDATE scores SET is_active = 1 WHERE id = ? AND nickname = ?", (score_id, nickname))
+            await db.commit()
+            return True
+
+    async def deactivate_all(nickname: str) -> bool:
+        async with aiosqlite.connect(DB_PATH) as db:
+            await db.execute("UPDATE scores SET is_active = 0 WHERE nickname = ?", (nickname,))
             await db.commit()
             return True
 

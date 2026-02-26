@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
-from .database import USE_PG, activate_score, add_score, get_leaderboard, get_round_percentile, get_scores_by_nickname, init_db
+from .database import USE_PG, activate_score, add_score, deactivate_all, get_leaderboard, get_round_percentile, get_scores_by_nickname, init_db
 
 
 @asynccontextmanager
@@ -75,6 +75,12 @@ async def percentile(score: int):
 async def leaderboard():
     entries = await get_leaderboard()
     return {"entries": entries}
+
+
+@app.put("/api/score/deactivate/{nickname}")
+async def deactivate_user_scores(nickname: str):
+    ok = await deactivate_all(nickname)
+    return {"ok": ok}
 
 
 @app.get("/api/health")
