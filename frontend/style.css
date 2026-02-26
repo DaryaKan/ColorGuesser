@@ -1,27 +1,3 @@
-@font-face {
-    font-family: 'SF Pro Rounded';
-    src: local('SF Pro Rounded'), local('.SFCompactRounded-Regular'), local('.SF-Pro-Rounded-Regular');
-    font-weight: 400;
-}
-
-@font-face {
-    font-family: 'SF Pro Rounded';
-    src: local('SF Pro Rounded Semibold'), local('.SFCompactRounded-Semibold'), local('.SF-Pro-Rounded-Semibold');
-    font-weight: 600;
-}
-
-@font-face {
-    font-family: 'SF Pro Rounded';
-    src: local('SF Pro Rounded Bold'), local('.SFCompactRounded-Bold'), local('.SF-Pro-Rounded-Bold');
-    font-weight: 700;
-}
-
-@font-face {
-    font-family: 'SF Pro Rounded';
-    src: local('SF Pro Rounded Heavy'), local('.SFCompactRounded-Heavy'), local('.SF-Pro-Rounded-Heavy');
-    font-weight: 800;
-}
-
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -48,7 +24,7 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
     overscroll-behavior: none;
