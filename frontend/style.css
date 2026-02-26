@@ -302,8 +302,9 @@ html {
     font-weight: 600;
     cursor: pointer;
     transition: opacity 0.2s, transform 0.1s;
-    min-width: 140px;
     text-align: center;
+    width: auto;
+    align-self: center;
 }
 
 .btn:active {
