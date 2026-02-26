@@ -40,6 +40,23 @@ app.add_middleware(
 )
 
 
+# Страницы — регистрируем до mount("/"), чтобы не отдавались как статика
+@app.get("/rating")
+async def rating():
+    p = FRONTEND_DIR / "rating.html"
+    if p.exists():
+        return FileResponse(p)
+    raise HTTPException(status_code=404, detail="Not found")
+
+
+@app.get("/dashboard")
+async def dashboard():
+    p = FRONTEND_DIR / "dashboard.html"
+    if p.exists():
+        return FileResponse(p)
+    raise HTTPException(status_code=404, detail="Not found")
+
+
 class ScoreSubmission(BaseModel):
     nickname: str = Field(..., min_length=1, max_length=64)
     score: int = Field(..., ge=0, le=400)
@@ -99,23 +116,6 @@ async def stats():
     data = await get_stats()
     entries = await get_leaderboard(limit=10)
     return {"total_players": data["total_players"], "total_games": data["total_games"], "top": entries}
-
-
-# Страница рейтинга (публичная)
-@app.get("/rating")
-async def rating():
-    p = FRONTEND_DIR / "rating.html"
-    if p.exists():
-        return FileResponse(p)
-    raise HTTPException(status_code=404, detail="Not found")
-
-
-@app.get("/dashboard")
-async def dashboard():
-    p = FRONTEND_DIR / "dashboard.html"
-    if p.exists():
-        return FileResponse(p)
-    raise HTTPException(status_code=404, detail="Not found")
 
 
 # Статика и главная (index.html по /) — один mount, пути как в рабочей версии

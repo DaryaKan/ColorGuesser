@@ -90,6 +90,8 @@
         .hint { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; }
         .loading { color: var(--text-secondary); }
         .error { color: #c00; font-size: 0.9rem; }
+        .empty-state { font-size: 0.9rem; color: var(--text-secondary); padding: 1rem !important; line-height: 1.5; }
+        .empty-state a { color: var(--accent); }
     </style>
 </head>
 <body>
@@ -109,7 +111,7 @@
             <div class="label">Всего игр</div>
         </div>
     </div>
-    <p class="section-title">Топ-10</p>
+    <p class="section-title">Рейтинг (как в миниаппе)</p>
     <table>
         <thead>
             <tr>
@@ -118,14 +120,16 @@
                 <th>Очки</th>
             </tr>
         </thead>
-        <tbody id="top-body"></tbody>
+        <tbody id="leaderboard-body"></tbody>
     </table>
-    <p class="hint">Обновляется при загрузке страницы.</p>
+    <p class="hint" id="status-hint">Те же данные, что в рейтинге миниаппа. Обновляется каждые 10 сек.</p>
     <script>
         (function () {
-            const topBody = document.getElementById("top-body");
+            const leaderboardBody = document.getElementById("leaderboard-body");
             const statPlayers = document.getElementById("stat-players");
             const statGames = document.getElementById("stat-games");
+            const statusHint = document.getElementById("status-hint");
+            var apiBase = window.location.origin;
 
             function escapeHtml(s) {
                 return (s || "").replace(/[&<>"']/g, function (c) {
@@ -133,40 +137,62 @@
                 });
             }
 
-            function renderTop(entries) {
-                topBody.innerHTML = "";
+            function renderLeaderboard(entries) {
+                leaderboardBody.innerHTML = "";
                 if (!entries || entries.length === 0) {
                     const tr = document.createElement("tr");
-                    tr.innerHTML = "<td colspan=\"3\">Пока нет записей</td>";
-                    topBody.appendChild(tr);
+                    tr.innerHTML = "<td colspan=\"3\" class=\"empty-state\">В рейтинге пока нет записей. Сыграйте в миниаппе (кнопка в боте) или <a href=\"/\">здесь на сайте</a> и сохраните результат — он появится в этой таблице. Открывайте дашборд по тому же адресу, что и игра.</td>";
+                    leaderboardBody.appendChild(tr);
                 } else {
                     entries.forEach(function (entry) {
                         const tr = document.createElement("tr");
                         tr.innerHTML = "<td>" + (entry.rank || "") + "</td><td>" + escapeHtml(entry.nickname) + "</td><td>" + (entry.score ?? "") + "</td>";
-                        topBody.appendChild(tr);
+                        leaderboardBody.appendChild(tr);
                     });
                 }
             }
 
-            function load() {
-                fetch("/api/stats")
+            function setStatus(text) {
+                if (statusHint) statusHint.textContent = text;
+            }
+
+            function loadStats() {
+                fetch(apiBase + "/api/stats", { cache: "no-store" })
                     .then(function (res) { return res.json(); })
                     .then(function (data) {
                         statPlayers.textContent = data.total_players ?? "—";
                         statGames.textContent = data.total_games ?? "—";
-                        renderTop(data.top || []);
                     })
                     .catch(function () {
                         statPlayers.textContent = "—";
                         statGames.textContent = "—";
-                        topBody.innerHTML = "";
-                        const tr = document.createElement("tr");
-                        tr.innerHTML = "<td colspan=\"3\" class=\"error\">Не удалось загрузить данные</td>";
-                        topBody.appendChild(tr);
                     });
             }
 
-            load();
+            function loadLeaderboard() {
+                fetch(apiBase + "/api/leaderboard", { cache: "no-store" })
+                    .then(function (res) {
+                        if (!res.ok) throw new Error("API " + res.status);
+                        return res.json();
+                    })
+                    .then(function (data) {
+                        var entries = data.entries || [];
+                        renderLeaderboard(entries);
+                        setStatus("Загружено записей: " + entries.length + ". Те же данные, что в миниаппе. Обновляется каждые 10 сек.");
+                    })
+                    .catch(function (err) {
+                        leaderboardBody.innerHTML = "";
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = "<td colspan=\"3\" class=\"error\">Не удалось загрузить рейтинг. Откройте дашборд по тому же адресу, что и игру: " + escapeHtml(apiBase) + "/dashboard</td>";
+                        leaderboardBody.appendChild(tr);
+                        setStatus("Ошибка загрузки. Адрес страницы: " + window.location.href);
+                    });
+            }
+
+            loadStats();
+            loadLeaderboard();
+            setInterval(loadLeaderboard, 10000);
+            setInterval(loadStats, 10000);
         })();
     </script>
 </body>
