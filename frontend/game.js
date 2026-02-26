@@ -431,22 +431,7 @@
 
     document.addEventListener("contextmenu", (e) => e.preventDefault());
 
-    function isInsideTelegram() {
-        const tg = window.Telegram && window.Telegram.WebApp;
-        return !!(tg && tg.initData);
-    }
-
     const tg = window.Telegram && window.Telegram.WebApp;
-    if (!isInsideTelegram()) {
-        // В браузере (не в Telegram) — сразу показываем публичную страницу рейтинга
-        if (!window.location.pathname.startsWith("/rating")) {
-            window.location.replace("/rating");
-            return;
-        }
-        showScreen("telegramOnly");
-        return;
-    }
-
     if (tg) {
         tg.ready();
         tg.expand();

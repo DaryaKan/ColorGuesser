@@ -1,13 +1,18 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
 from .database import USE_PG, activate_score, add_score, deactivate_all, get_leaderboard, get_round_percentile, get_scores_by_nickname, init_db
+
+# Путь к фронту не зависит от текущей папки (важно для Docker/Railway)
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
 
 @asynccontextmanager
@@ -89,4 +94,14 @@ async def health():
     return {"db": "postgresql" if USE_PG else "sqlite"}
 
 
-app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+# Страница рейтинга (публичная)
+@app.get("/rating")
+async def rating():
+    p = FRONTEND_DIR / "rating.html"
+    if p.exists():
+        return FileResponse(p)
+    raise HTTPException(status_code=404, detail="Not found")
+
+
+# Статика и главная (index.html по /) — один mount, пути как в рабочей версии
+app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")

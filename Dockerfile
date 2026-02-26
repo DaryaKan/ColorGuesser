@@ -9,5 +9,5 @@ COPY . .
 
 EXPOSE 8000
 
-# Веб — только таблица рейтинга, без бота. PORT задаёт Railway.
-CMD ["sh", "-c", "uvicorn backend.app:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Веб + бот в одном контейнере: run.py поднимает uvicorn и бота. Нужны BOT_TOKEN, WEBAPP_URL, PORT.
+CMD ["sh", "-c", "python run.py"]
