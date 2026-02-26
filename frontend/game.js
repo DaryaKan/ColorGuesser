@@ -263,11 +263,12 @@
         els.cardFront.addEventListener("transitionend", function onEnd(e) {
             if (e.target !== els.cardFront) return;
             els.cardFront.removeEventListener("transitionend", onEnd);
-            els.cardFront.classList.remove("fly-away");
 
             if (state.round >= TOTAL_ROUNDS) {
+                screens.cards.classList.remove("active");
                 finishGame();
             } else {
+                els.cardFront.classList.remove("fly-away");
                 nextRound();
             }
         });
