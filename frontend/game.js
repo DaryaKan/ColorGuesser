@@ -241,7 +241,9 @@
     }
 
     async function confirmPick() {
-        if (state.isFinishing) return;
+        if (state.round >= TOTAL_ROUNDS && state.isFinishing) return;
+        if (state.round >= TOTAL_ROUNDS) state.isFinishing = true;
+
         const pickedH = state.pickedHue != null ? state.pickedHue : 0;
         const pickedS = state.pickedSat != null ? state.pickedSat : 50;
         const accuracy = calcAccuracy(
@@ -258,7 +260,6 @@
         els.totalScoreLabel.textContent = state.totalScore;
 
         if (state.round >= TOTAL_ROUNDS) {
-            state.isFinishing = true;
             try {
                 await finishGame();
             } finally {
