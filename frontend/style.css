@@ -430,7 +430,6 @@ h2 {
     font-weight: 600;
     color: var(--text-secondary);
     text-align: left;
-    border-bottom: 1px solid var(--border);
 }
 
 #leaderboard-table th:first-child {
@@ -446,7 +445,6 @@ h2 {
 #leaderboard-table td {
     padding: 10px 16px;
     font-size: 15px;
-    border-bottom: 1px solid var(--border);
 }
 
 #leaderboard-table td:first-child {
