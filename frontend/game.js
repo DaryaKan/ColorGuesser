@@ -286,7 +286,6 @@
             els.cardFront.removeEventListener("transitionend", onEnd);
 
             if (state.round >= TOTAL_ROUNDS) {
-                screens.cards.classList.remove("active");
                 finishGame();
             } else {
                 els.cardFront.classList.remove("fly-away");
@@ -311,8 +310,14 @@
         state.savedNickname = nickname;
 
         try {
-            const existing = await fetch(`/api/scores/${encodeURIComponent(nickname)}`);
-            const existingData = await existing.json();
+            let existingScores = [];
+            try {
+                const existingRes = await fetch(`/api/scores/${encodeURIComponent(nickname)}`);
+                const existingData = await existingRes.json();
+                existingScores = existingData.scores || [];
+            } catch (e) {
+                console.error("Failed to load scores:", e);
+            }
 
             const saveRes = await fetch("/api/score", {
                 method: "POST",
@@ -320,13 +325,13 @@
                 body: JSON.stringify({
                     nickname,
                     score: state.totalScore,
-                    is_active: !existingData.scores.length,
+                    is_active: existingScores.length === 0,
                 }),
             });
             const saveData = await saveRes.json();
 
-            if (existingData.scores.length > 0) {
-                showPickScoreScreen(existingData.scores, saveData.id);
+            if (existingScores.length > 0) {
+                showPickScoreScreen(existingScores, saveData.id);
                 return;
             }
         } catch (err) {
