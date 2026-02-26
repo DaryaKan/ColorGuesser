@@ -504,6 +504,12 @@ h2 {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: none;
     padding-bottom: 4px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.score-list::-webkit-scrollbar {
+    display: none;
 }
 
 .score-option {
