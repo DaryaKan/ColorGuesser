@@ -170,7 +170,7 @@ html {
     flex: 0 0 auto;
     aspect-ratio: 0.75;
     max-height: 60vh;
-    margin-top: -20px;
+    margin-top: -44px;
     margin-bottom: 20px;
 }
 
@@ -233,6 +233,17 @@ html {
     padding: 16px;
     gap: 12px;
     height: 100%;
+    min-height: 140px;
+    box-sizing: border-box;
+}
+
+#card-result {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
 }
 
 /* --- Target color --- */

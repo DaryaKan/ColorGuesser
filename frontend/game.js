@@ -240,15 +240,17 @@
     }
 
     async function confirmPick() {
+        const pickedH = state.pickedHue != null ? state.pickedHue : 0;
+        const pickedS = state.pickedSat != null ? state.pickedSat : 50;
         const accuracy = calcAccuracy(
             state.targetHue, state.targetSat,
-            state.pickedHue, state.pickedSat
+            pickedH, pickedS
         );
         state.totalScore += accuracy;
         state.roundScores.push(accuracy);
 
         els.resultTarget.style.background = hslString(state.targetHue, state.targetSat);
-        els.resultPicked.style.background = hslString(state.pickedHue, state.pickedSat);
+        els.resultPicked.style.background = hslString(pickedH, pickedS);
         els.resultAccuracy.textContent = `${accuracy} / 100`;
         els.resultPercentile.textContent = "";
         els.totalScoreLabel.textContent = state.totalScore;
@@ -258,6 +260,12 @@
         els.btnNext.style.display = "";
 
         showCardContent("result");
+        els.cardResult.style.visibility = "visible";
+        els.cardResult.style.opacity = "1";
+        void els.cardResult.offsetHeight;
+        requestAnimationFrame(function () {
+            els.cardResult.offsetHeight;
+        });
 
         try {
             const res = await fetch(`/api/percentile/${accuracy}`);
