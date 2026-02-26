@@ -46,6 +46,7 @@
         selectedScoreId: null,
         roundScores: [],
         isFinishing: false,
+        round4Done: false,
     };
 
     function showScreen(name) {
@@ -209,6 +210,8 @@
         state.round = 0;
         state.totalScore = 0;
         state.roundScores = [];
+        state.round4Done = false;
+        state.isFinishing = false;
         els.cardBack1.classList.remove("hide");
         els.cardBack2.classList.remove("hide");
         els.cardBack3.classList.remove("hide");
@@ -241,8 +244,11 @@
     }
 
     async function confirmPick() {
-        if (state.round >= TOTAL_ROUNDS && state.isFinishing) return;
-        if (state.round >= TOTAL_ROUNDS) state.isFinishing = true;
+        if (state.round >= TOTAL_ROUNDS) {
+            if (state.round4Done) return;
+            state.round4Done = true;
+            els.btnConfirm.disabled = true;
+        }
 
         const pickedH = state.pickedHue != null ? state.pickedHue : 0;
         const pickedS = state.pickedSat != null ? state.pickedSat : 50;
@@ -260,11 +266,7 @@
         els.totalScoreLabel.textContent = state.totalScore;
 
         if (state.round >= TOTAL_ROUNDS) {
-            try {
-                await finishGame();
-            } finally {
-                state.isFinishing = false;
-            }
+            await finishGame();
             return;
         }
 
