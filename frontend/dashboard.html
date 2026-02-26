@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <title>Color Guesser — Дашборд</title>
+    <style>
+        :root {
+            --bg: #f2f2f7;
+            --surface: #fff;
+            --border: #d1d1d6;
+            --text: #1c1c1e;
+            --text-secondary: #8e8e93;
+            --accent: #1c1c1e;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 1rem;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        h1 { font-size: 1.75rem; margin: 0 0 0.25rem 0; font-weight: 800; }
+        h2 { font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin: 0 0 1rem 0; }
+        .nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .nav a:hover { text-decoration: underline; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+        }
+        .stat-card .value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 0 0 0.5rem 0;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 400px;
+            background: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        th, td {
+            padding: 0.6rem 1rem;
+            text-align: left;
+        }
+        th {
+            background: #f5f5f7;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        th:first-child, td:first-child { text-align: center; width: 60px; }
+        th:last-child, td:last-child { text-align: right; width: 70px; }
+        .hint { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; }
+        .loading { color: var(--text-secondary); }
+        .error { color: #c00; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <h1>Color Guesser</h1>
+    <h2>Дашборд</h2>
+    <nav class="nav">
+        <a href="/">Играть</a>
+        <a href="/rating">Рейтинг</a>
+    </nav>
+    <div class="stats" id="stats">
+        <div class="stat-card">
+            <div class="value" id="stat-players">—</div>
+            <div class="label">Игроков в рейтинге</div>
+        </div>
+        <div class="stat-card">
+            <div class="value" id="stat-games">—</div>
+            <div class="label">Всего игр</div>
+        </div>
+    </div>
+    <p class="section-title">Топ-10</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Место</th>
+                <th>Ник</th>
+                <th>Очки</th>
+            </tr>
+        </thead>
+        <tbody id="top-body"></tbody>
+    </table>
+    <p class="hint">Обновляется при загрузке страницы.</p>
+    <script>
+        (function () {
+            const topBody = document.getElementById("top-body");
+            const statPlayers = document.getElementById("stat-players");
+            const statGames = document.getElementById("stat-games");
+
+            function escapeHtml(s) {
+                return (s || "").replace(/[&<>"']/g, function (c) {
+                    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+                });
+            }
+
+            function renderTop(entries) {
+                topBody.innerHTML = "";
+                if (!entries || entries.length === 0) {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = "<td colspan=\"3\">Пока нет записей</td>";
+                    topBody.appendChild(tr);
+                } else {
+                    entries.forEach(function (entry) {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = "<td>" + (entry.rank || "") + "</td><td>" + escapeHtml(entry.nickname) + "</td><td>" + (entry.score ?? "") + "</td>";
+                        topBody.appendChild(tr);
+                    });
+                }
+            }
+
+            function load() {
+                fetch("/api/stats")
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        statPlayers.textContent = data.total_players ?? "—";
+                        statGames.textContent = data.total_games ?? "—";
+                        renderTop(data.top || []);
+                    })
+                    .catch(function () {
+                        statPlayers.textContent = "—";
+                        statGames.textContent = "—";
+                        topBody.innerHTML = "";
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = "<td colspan=\"3\" class=\"error\">Не удалось загрузить данные</td>";
+                        topBody.appendChild(tr);
+                    });
+            }
+
+            load();
+        })();
+    </script>
+</body>
+</html>

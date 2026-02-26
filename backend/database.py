@@ -96,6 +96,15 @@ if USE_PG:
             entries.append({"rank": current_rank, "nickname": r["nickname"], "score": r["score"]})
         return entries
 
+    async def get_stats() -> dict:
+        pool = await _get_pool()
+        async with pool.acquire() as conn:
+            total_players = await conn.fetchval(
+                "SELECT COUNT(DISTINCT nickname) FROM scores WHERE is_active = TRUE"
+            )
+            total_games = await conn.fetchval("SELECT COUNT(*) FROM scores")
+        return {"total_players": total_players or 0, "total_games": total_games or 0}
+
 else:
     import aiosqlite
 
@@ -177,3 +186,13 @@ else:
                 prev_score = r["score"]
             entries.append({"rank": current_rank, "nickname": r["nickname"], "score": r["score"]})
         return entries
+
+    async def get_stats() -> dict:
+        async with aiosqlite.connect(DB_PATH) as db:
+            cursor = await db.execute(
+                "SELECT COUNT(DISTINCT nickname) FROM scores WHERE is_active = 1"
+            )
+            total_players = (await cursor.fetchone())[0]
+            cursor = await db.execute("SELECT COUNT(*) FROM scores")
+            total_games = (await cursor.fetchone())[0]
+        return {"total_players": total_players, "total_games": total_games}

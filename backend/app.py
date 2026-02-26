@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
-from .database import USE_PG, activate_score, add_score, deactivate_all, get_leaderboard, get_round_percentile, get_scores_by_nickname, init_db
+from .database import USE_PG, activate_score, add_score, deactivate_all, get_leaderboard, get_round_percentile, get_scores_by_nickname, get_stats, init_db
 
 # Путь к фронту не зависит от текущей папки (важно для Docker/Railway)
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
@@ -94,10 +94,25 @@ async def health():
     return {"db": "postgresql" if USE_PG else "sqlite"}
 
 
+@app.get("/api/stats")
+async def stats():
+    data = await get_stats()
+    entries = await get_leaderboard(limit=10)
+    return {"total_players": data["total_players"], "total_games": data["total_games"], "top": entries}
+
+
 # Страница рейтинга (публичная)
 @app.get("/rating")
 async def rating():
     p = FRONTEND_DIR / "rating.html"
+    if p.exists():
+        return FileResponse(p)
+    raise HTTPException(status_code=404, detail="Not found")
+
+
+@app.get("/dashboard")
+async def dashboard():
+    p = FRONTEND_DIR / "dashboard.html"
     if p.exists():
         return FileResponse(p)
     raise HTTPException(status_code=404, detail="Not found")
