@@ -21,13 +21,17 @@ def start_bot():
 
 
 if __name__ == "__main__":
-    if not BOT_TOKEN:
-        raise RuntimeError("Set BOT_TOKEN environment variable")
-    if not WEBAPP_URL:
-        raise RuntimeError("Set WEBAPP_URL environment variable")
-
     server_thread = threading.Thread(target=start_server, daemon=True)
     server_thread.start()
     logger.info("Server started in background")
 
-    start_bot()
+    if not BOT_TOKEN or not WEBAPP_URL:
+        logger.warning(
+            "BOT_TOKEN or WEBAPP_URL not set — bot will NOT start. "
+            "Set both in Railway Variables for /start to work."
+        )
+        import time
+        while True:
+            time.sleep(3600)
+    else:
+        start_bot()

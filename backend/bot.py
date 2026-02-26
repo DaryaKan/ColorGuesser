@@ -12,27 +12,38 @@ WEBAPP_URL = os.getenv("WEBAPP_URL", "")
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if WEBAPP_URL:
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton(
-                text="🎨 Play",
-                web_app=WebAppInfo(url=WEBAPP_URL),
-            )]
-        ])
-        await update.message.reply_text(
-            "🎨 *Color Guesser Game*\n\n"
-            "Guess the right color on the color wheel!\n"
-            "• 4 rounds per game\n"
-            "• Up to 100 points per round\n"
-            "• Max score: 400\n\n"
-            "Tap the button below to play 👇",
-            reply_markup=keyboard,
-            parse_mode="Markdown",
-        )
-    else:
-        await update.message.reply_text(
-            "Welcome to Color Guesser Game!\nThe game is being set up. Please try again later.",
-        )
+    try:
+        if not update or not update.effective_message:
+            logger.warning("Start: no message in update")
+            return
+        if WEBAPP_URL:
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton(
+                    text="🎨 Play",
+                    web_app=WebAppInfo(url=WEBAPP_URL),
+                )]
+            ])
+            await update.effective_message.reply_text(
+                "🎨 *Color Guesser Game*\n\n"
+                "Guess the right color on the color wheel!\n"
+                "• 4 rounds per game\n"
+                "• Up to 100 points per round\n"
+                "• Max score: 400\n\n"
+                "Tap the button below to play 👇",
+                reply_markup=keyboard,
+                parse_mode="Markdown",
+            )
+        else:
+            await update.effective_message.reply_text(
+                "Welcome to Color Guesser Game!\nThe game is being set up. Please try again later.",
+            )
+    except Exception as e:
+        logger.exception("Start handler error: %s", e)
+        if update and update.effective_message:
+            try:
+                await update.effective_message.reply_text("Something went wrong. Try again.")
+            except Exception:
+                pass
 
 
 async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
