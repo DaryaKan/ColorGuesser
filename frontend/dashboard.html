@@ -40,23 +40,26 @@
         .nav a:hover { text-decoration: underline; }
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 400px;
         }
         .stat-card {
             background: radial-gradient(circle, #ffeb3b, #3adf68);
-            border-radius: 16px;
+            border-radius: 32px;
             padding: 1rem;
         }
         .stat-card .value {
             font-size: 1.75rem;
             font-weight: 800;
             letter-spacing: -0.5px;
+            color: #000000;
         }
         .stat-card .label {
             font-size: 0.85rem;
-            color: var(--text-secondary);
+            color: #000000;
             font-weight: 500;
             margin-top: 4px;
         }
@@ -71,7 +74,7 @@
             width: 100%;
             max-width: 400px;
             background: var(--surface);
-            border-radius: 12px;
+            border-radius: 32px;
             overflow: hidden;
         }
         th, td {
