@@ -45,6 +45,7 @@
         savedNickname: "",
         selectedScoreId: null,
         roundScores: [],
+        isFinishing: false,
     };
 
     function showScreen(name) {
@@ -240,6 +241,7 @@
     }
 
     async function confirmPick() {
+        if (state.isFinishing) return;
         const pickedH = state.pickedHue != null ? state.pickedHue : 0;
         const pickedS = state.pickedSat != null ? state.pickedSat : 50;
         const accuracy = calcAccuracy(
@@ -256,7 +258,12 @@
         els.totalScoreLabel.textContent = state.totalScore;
 
         if (state.round >= TOTAL_ROUNDS) {
-            await finishGame();
+            state.isFinishing = true;
+            try {
+                await finishGame();
+            } finally {
+                state.isFinishing = false;
+            }
             return;
         }
 
@@ -312,17 +319,18 @@
     async function finishGame() {
         const nickname = getNickname();
         state.savedNickname = nickname;
+        let existingScores = [];
+        let newScoreId = null;
 
         try {
-            let existingScores = [];
-            try {
-                const existingRes = await fetch(`/api/scores/${encodeURIComponent(nickname)}`);
-                const existingData = await existingRes.json();
-                existingScores = existingData.scores || [];
-            } catch (e) {
-                console.error("Failed to load scores:", e);
-            }
+            const existingRes = await fetch(`/api/scores/${encodeURIComponent(nickname)}`);
+            const existingData = await existingRes.json().catch(() => ({}));
+            existingScores = existingData.scores || [];
+        } catch (e) {
+            console.error("Failed to load scores:", e);
+        }
 
+        try {
             const saveRes = await fetch("/api/score", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -332,16 +340,17 @@
                     is_active: existingScores.length === 0,
                 }),
             });
-            const saveData = await saveRes.json();
-
-            if (existingScores.length > 0) {
-                showPickScoreScreen(existingScores, saveData.id);
-                return;
-            }
+            const saveData = await saveRes.json().catch(() => ({}));
+            if (saveData && saveData.id != null) newScoreId = saveData.id;
         } catch (err) {
             console.error("Failed to save score:", err);
         }
-        showLeaderboard();
+
+        if (existingScores.length > 0 && newScoreId != null) {
+            showPickScoreScreen(existingScores, newScoreId);
+        } else {
+            showLeaderboard();
+        }
     }
 
     function showPickScoreScreen(existingScores, newId) {
