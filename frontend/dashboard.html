@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="index, follow">
-    <title>Color Guesser — Дашборд</title>
+    <title>Color Guesser</title>
     <style>
         :root {
-            --bg: #f2f2f7;
+            --bg: #000000;
             --surface: #fff;
             --border: #d1d1d6;
             --text: #1c1c1e;
@@ -22,7 +22,7 @@
             color: var(--text);
             min-height: 100vh;
         }
-        h1 { font-size: 1.75rem; margin: 0 0 0.25rem 0; font-weight: 800; }
+        h1 { font-size: 1.75rem; margin: 0 0 0.25rem 0; font-weight: 800; color: #ffffff; }
         h2 { font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin: 0 0 1rem 0; }
         .nav {
             display: flex;
@@ -92,15 +92,11 @@
         .error { color: #c00; font-size: 0.9rem; }
         .empty-state { font-size: 0.9rem; color: var(--text-secondary); padding: 1rem !important; line-height: 1.5; }
         .empty-state a { color: var(--accent); }
+        .url-hint { display: block; margin-top: 6px; font-size: 0.8rem; color: var(--text-secondary); }
     </style>
 </head>
 <body>
     <h1>Color Guesser</h1>
-    <h2>Дашборд</h2>
-    <nav class="nav">
-        <a href="/">Играть</a>
-        <a href="/rating">Рейтинг</a>
-    </nav>
     <div class="stats" id="stats">
         <div class="stat-card">
             <div class="value" id="stat-players">—</div>
@@ -111,7 +107,6 @@
             <div class="label">Всего игр</div>
         </div>
     </div>
-    <p class="section-title">Рейтинг (как в миниаппе)</p>
     <table>
         <thead>
             <tr>
@@ -122,7 +117,6 @@
         </thead>
         <tbody id="leaderboard-body"></tbody>
     </table>
-    <p class="hint" id="status-hint">Те же данные, что в рейтинге миниаппа. Обновляется каждые 10 сек.</p>
     <script>
         (function () {
             const leaderboardBody = document.getElementById("leaderboard-body");
@@ -152,8 +146,8 @@
                 }
             }
 
-            function setStatus(text) {
-                if (statusHint) statusHint.textContent = text;
+            function setStatus(text, extra) {
+                if (statusHint) statusHint.innerHTML = text + (extra ? " <span class=\"url-hint\">" + escapeHtml(extra) + "</span>" : "");
             }
 
             function loadStats() {
@@ -178,7 +172,8 @@
                     .then(function (data) {
                         var entries = data.entries || [];
                         renderLeaderboard(entries);
-                        setStatus("Загружено записей: " + entries.length + ". Те же данные, что в миниаппе. Обновляется каждые 10 сек.");
+                        var msg = "Загружено записей: " + entries.length + ". Те же данные, что в миниаппе. Обновляется каждые 10 сек.";
+                        setStatus(msg, entries.length === 0 ? "Запрос к: " + apiBase + "/api/leaderboard — открой дашборд по тому же адресу, что и миниапп в боте." : "");
                     })
                     .catch(function (err) {
                         leaderboardBody.innerHTML = "";
