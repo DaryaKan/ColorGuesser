@@ -132,8 +132,10 @@ html {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    align-self: flex-start;
     flex-shrink: 0;
     margin-bottom: 12px;
+    width: 100%;
 }
 
 .page-title h1 {
@@ -152,6 +154,8 @@ html {
     color: var(--text);
     white-space: nowrap;
     margin-top: 6px;
+    margin-left: auto;
+    text-align: right;
 }
 
 /* --- Cards --- */
@@ -166,6 +170,7 @@ html {
     flex: 0 0 auto;
     aspect-ratio: 0.75;
     max-height: 60vh;
+    margin-top: -20px;
     margin-bottom: 20px;
 }
 
