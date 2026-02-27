@@ -47,6 +47,10 @@
             flex-direction: column;
             gap: 12px;
         }
+        .left-col .bottom-row {
+            margin-top: 0;
+            margin-left: 0;
+        }
         .bezel-wrap {
             width: 944px;
             max-width: 100%;
@@ -137,8 +141,9 @@
             display: flex;
             align-items: stretch;
             gap: 12px;
-            margin-left: 12px;
-            margin-bottom: 1.5rem;
+            margin-top: 12px;
+            margin-left: 0;
+            margin-bottom: 0;
         }
         .bottom-row .img-wrap {
             width: 624px;
@@ -264,6 +269,14 @@
                 <img src="/assets/bezel-grid.png" alt="">
                 <div class="bezel-leaderboard" id="leaderboard-body"></div>
             </div>
+            <div class="bottom-row">
+                <div class="img-wrap img-wrap-ozontech">
+                    <img src="/assets/ozon-tech.png" alt="OZONtech">
+                </div>
+                <div class="img-wrap img-wrap-ozon">
+                    <img src="/assets/ozon.png" alt="OZON">
+                </div>
+            </div>
         </div>
         <div class="right-col">
             <div class="hero-img-wrap">
@@ -272,14 +285,6 @@
             <div class="tg-channel-wrap">
                 <img src="/assets/tg-channel.png" alt="tg-канал">
             </div>
-        </div>
-    </div>
-    <div class="bottom-row">
-        <div class="img-wrap img-wrap-ozontech">
-            <img src="/assets/ozon-tech.png" alt="OZONtech">
-        </div>
-        <div class="img-wrap img-wrap-ozon">
-            <img src="/assets/ozon.png" alt="OZON">
         </div>
     </div>
     <script>
