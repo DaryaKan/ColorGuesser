@@ -262,21 +262,9 @@
             <a href="/rating" class="rating">Рейтинг</a>
         </nav>
     </header>
-    <div class="cards" id="stats">
-        <div class="card">
-            <div class="value" id="stat-players">0</div>
-            <div class="label">Игроков в рейтинге</div>
-        </div>
-        <div class="card">
-            <div class="value" id="stat-games">0</div>
-            <div class="label">Всего игр</div>
-        </div>
-    </div>
     <script>
         (function () {
             const leaderboardContainer = document.getElementById("leaderboard-body");
-            const statPlayers = document.getElementById("stat-players");
-            const statGames = document.getElementById("stat-games");
             var apiBase = window.location.origin;
 
             function escapeHtml(s) {
@@ -303,19 +291,6 @@
                 }
             }
 
-            function loadStats() {
-                fetch(apiBase + "/api/stats", { cache: "no-store" })
-                    .then(function (res) { return res.json(); })
-                    .then(function (data) {
-                        statPlayers.textContent = data.total_players ?? "0";
-                        statGames.textContent = data.total_games ?? "0";
-                    })
-                    .catch(function () {
-                        statPlayers.textContent = "0";
-                        statGames.textContent = "0";
-                    });
-            }
-
             function loadLeaderboard() {
                 fetch(apiBase + "/api/leaderboard", { cache: "no-store" })
                     .then(function (res) {
@@ -333,10 +308,8 @@
                     });
             }
 
-            loadStats();
             loadLeaderboard();
             setInterval(loadLeaderboard, 10000);
-            setInterval(loadStats, 10000);
         })();
     </script>
 </body>
