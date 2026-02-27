@@ -54,12 +54,16 @@
         .bezel-wrap {
             width: 944px;
             max-width: 100%;
+            height: 695px;
             position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
         }
         .bezel-wrap img {
             display: block;
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
         }
         .bezel-leaderboard {
             position: absolute;
@@ -144,21 +148,13 @@
             margin-top: 12px;
             margin-left: 0;
             margin-bottom: 0;
+            width: 100%;
         }
         .bottom-row .img-wrap {
-            width: 624px;
-            max-width: 100%;
-            height: 244px;
+            flex: 1;
+            min-width: 0;
+            height: 182px;
             overflow: hidden;
-            flex-shrink: 0;
-        }
-        .bottom-row .img-wrap.img-wrap-ozontech {
-            width: 466px;
-            height: 182px;
-        }
-        .bottom-row .img-wrap.img-wrap-ozon {
-            width: 466px;
-            height: 182px;
         }
         .bottom-row .img-wrap img {
             display: block;
